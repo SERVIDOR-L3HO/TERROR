@@ -3,303 +3,281 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>VOCES DEL TERROR — Confiesa tu Miedo</title>
-  <meta name="description" content="Comparte tus experiencias de terror más oscuras. Historias reales de miedo con audio, fotos y evidencias.">
+  <title>Voces del Terror — Historias Reales de Miedo</title>
+  <meta name="description" content="Comparte y lee historias reales de terror. Experiencias paranormales, apariciones, demonios y más. Con audio narrado y evidencias fotográficas.">
   <link rel="stylesheet" href="/css/styles.css">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💀</text></svg>">
 </head>
 <body>
+  <canvas class="particles-canvas" id="particlesCanvas"></canvas>
 
-  <!-- LOADING SCREEN -->
   <div class="loading-overlay" id="loadingOverlay">
     <div class="loading-logo">💀 VOCES DEL TERROR</div>
     <div class="loading-bar"><div class="loading-bar-fill"></div></div>
-    <p style="font-family:'Special Elite',cursive;font-size:0.75rem;letter-spacing:4px;color:#5c0000;text-transform:uppercase;">Abriendo el portal...</p>
   </div>
 
-  <!-- PARTICLES -->
-  <div class="particles-container" id="particles"></div>
-
-  <!-- NAVBAR -->
   <nav class="navbar">
-    <a href="/" class="nav-logo">💀 <span>VOCES</span> DEL TERROR</a>
+    <a href="/" class="nav-logo">💀 <span class="blood">VOCES</span> DEL TERROR</a>
     <ul class="nav-links" id="navLinks">
-      <li><a href="/">Inicio</a></li>
+      <li><a href="/" class="active">Inicio</a></li>
       <li><a href="/historias">Historias</a></li>
-      <li><a href="/subir" class="btn-nav">+ Confesar</a></li>
+      <li><a href="/subir">Escribir</a></li>
     </ul>
-    <button class="hamburger" id="hamburger" aria-label="Menú">
-      <span></span><span></span><span></span>
-    </button>
+    <div id="navLoginArea" style="display:flex;gap:8px;align-items:center;flex-shrink:0;">
+      <a href="/login" class="nav-btn outline">Entrar</a>
+      <a href="/login?tab=registro" class="nav-btn">Registro</a>
+    </div>
+    <div id="navUserArea" class="nav-user" style="display:none;flex-shrink:0;">
+      <div class="nav-avatar" onclick="window.__td&&window.__td()">
+        <img id="navAvatarImg" src="" alt="" style="display:none;width:100%;height:100%;object-fit:cover;">
+        <span id="navAvatarInit"></span>
+      </div>
+      <div class="nav-dropdown" id="navDropdown">
+        <div class="nav-dropdown-header">
+          <div class="nav-dropdown-name" id="navDropdownName"></div>
+          <div class="nav-dropdown-email" id="navDropdownEmail"></div>
+        </div>
+        <a href="/perfil">👤 Mi Perfil</a>
+        <a href="/subir">✍ Nueva Historia</a>
+        <div class="nav-dropdown-divider"></div>
+        <button onclick="window.__so&&window.__so()" class="danger">⬅ Cerrar Sesión</button>
+      </div>
+    </div>
+    <button class="hamburger" id="hamburger" aria-label="Menú"><span></span><span></span><span></span></button>
   </nav>
 
   <!-- HERO -->
   <section class="hero">
-    <div class="hero-bg"></div>
-    <div class="drip-container" id="drips"></div>
     <div class="hero-content">
-      <p class="hero-eyebrow">⚠ Historias Reales de Terror ⚠</p>
-      <h1 class="hero-title">VOCES<br><span class="blood">DEL</span><br>TERROR</h1>
-      <p class="hero-subtitle">"Las sombras tienen memoria... y tú has dejado tu huella en ellas"</p>
-      <div class="hero-buttons">
-        <a href="/historias" class="btn-primary">👁 Leer Historias</a>
-        <a href="/subir" class="btn-secondary">🩸 Contar la Tuya</a>
+      <div class="hero-badge">⚠ Solo para valientes — Historias Reales</div>
+      <h1 class="hero-title">VOCES<br><span class="accent">DEL</span><br>TERROR</h1>
+      <p class="hero-sub">"Las sombras tienen memoria. Cada historia aquí fue vivida por alguien que no pudo callar."</p>
+      <div class="hero-actions">
+        <a href="/historias" class="btn btn-primary btn-lg">Leer Historias</a>
+        <a href="/subir" class="btn btn-secondary btn-lg">Contar la tuya</a>
       </div>
     </div>
-    <div class="scroll-indicator">Descender</div>
+    <div class="hero-scroll">Explorar</div>
   </section>
 
-  <!-- STATS BAR -->
+  <!-- STATS -->
   <div class="stats-bar">
-    <div class="stat-item">
-      <span class="stat-number" id="statHistorias">0</span>
-      <span class="stat-label">Historias</span>
-    </div>
-    <div class="stat-item">
-      <span class="stat-number" id="statEvidencias">0</span>
-      <span class="stat-label">Evidencias</span>
-    </div>
-    <div class="stat-item">
-      <span class="stat-number" id="statAlmas">666+</span>
-      <span class="stat-label">Almas Atrapadas</span>
-    </div>
-    <div class="stat-item">
-      <span class="stat-number">∞</span>
-      <span class="stat-label">Pesadillas</span>
-    </div>
+    <div class="stat"><span class="stat-number" id="statHistorias">—</span><span class="stat-label">Historias</span></div>
+    <div class="stat-divider"></div>
+    <div class="stat"><span class="stat-number" id="statEvidencias">—</span><span class="stat-label">Evidencias</span></div>
+    <div class="stat-divider"></div>
+    <div class="stat"><span class="stat-number" id="statAutores">—</span><span class="stat-label">Narradores</span></div>
+    <div class="stat-divider"></div>
+    <div class="stat"><span class="stat-number">∞</span><span class="stat-label">Pesadillas</span></div>
   </div>
 
-  <!-- FEATURED STORY -->
+  <!-- FEATURED + RECENT -->
   <div class="section">
-    <div id="featuredContainer"></div>
+    <div class="container">
+      <!-- Featured -->
+      <div id="featuredContainer"></div>
 
-    <!-- RECENT STORIES -->
-    <div class="section-header fade-in">
-      <span class="section-eyebrow">— Recién Confessado —</span>
-      <h2 class="section-title">Últimas Historias</h2>
-      <div class="section-divider"></div>
-    </div>
-
-    <div class="stories-grid" id="storiesGrid">
-      <div class="empty-state" id="loadingStories">
-        <span class="empty-state-icon">⏳</span>
-        <h3>Invocando historias...</h3>
+      <!-- Recent -->
+      <div class="section-header fade-up">
+        <span class="section-label">— Recién Publicado —</span>
+        <h2 class="section-title">Últimas Confesiones</h2>
       </div>
-    </div>
-
-    <div style="text-align:center;margin-top:3rem;">
-      <a href="/historias" class="btn-primary">Ver todas las historias</a>
+      <div class="stories-grid" id="storiesGrid">
+        <div class="empty-state" style="grid-column:1/-1">
+          <div class="empty-icon">⏳</div>
+          <p class="empty-sub">Invocando historias...</p>
+        </div>
+      </div>
+      <div style="text-align:center;margin-top:2.5rem;">
+        <a href="/historias" class="btn btn-secondary">Ver todas las historias →</a>
+      </div>
     </div>
   </div>
 
   <!-- CATEGORIES -->
-  <div style="background: linear-gradient(135deg, #050005, #060006); padding: 6rem 2rem; border-top: 1px solid #0d000d;">
-    <div style="max-width:1200px;margin:0 auto;">
-      <div class="section-header fade-in">
-        <span class="section-eyebrow">— Explora por Categoría —</span>
-        <h2 class="section-title" style="text-shadow: 0 0 20px rgba(155,89,182,0.4);">Tipos de Horror</h2>
-        <div class="section-divider" style="background: linear-gradient(to right, transparent, #6c0b9e, transparent);"></div>
-      </div>
-      <div class="categories-grid fade-in">
-        <a href="/historias?cat=aparicion" class="category-card">
-          <span class="category-icon">👻</span>
-          <div class="category-name">Apariciones</div>
-          <div class="category-count">Espíritus y Fantasmas</div>
-        </a>
-        <a href="/historias?cat=demonio" class="category-card">
-          <span class="category-icon">😈</span>
-          <div class="category-name">Demonios</div>
-          <div class="category-count">Entidades Oscuras</div>
-        </a>
-        <a href="/historias?cat=extraterrestre" class="category-card">
-          <span class="category-icon">👽</span>
-          <div class="category-name">Extraterrestres</div>
-          <div class="category-count">Más Allá del Cielo</div>
-        </a>
-        <a href="/historias?cat=maldicion" class="category-card">
-          <span class="category-icon">🪄</span>
-          <div class="category-name">Maldiciones</div>
-          <div class="category-count">Hechizos y Brujas</div>
-        </a>
-        <a href="/historias?cat=paranormal" class="category-card">
-          <span class="category-icon">🔮</span>
-          <div class="category-name">Paranormal</div>
-          <div class="category-count">Sin Explicación</div>
-        </a>
-        <a href="/historias?cat=asesino" class="category-card">
-          <span class="category-icon">🔪</span>
-          <div class="category-name">Asesinos</div>
-          <div class="category-count">Horror Real</div>
-        </a>
-        <a href="/historias?cat=suenos" class="category-card">
-          <span class="category-icon">😴</span>
-          <div class="category-name">Sueños</div>
-          <div class="category-count">Pesadillas</div>
-        </a>
-        <a href="/historias?cat=otro" class="category-card">
-          <span class="category-icon">❓</span>
-          <div class="category-name">Otro</div>
-          <div class="category-count">Lo Inexplicable</div>
-        </a>
+  <div style="background:var(--bg-2);border-top:1px solid var(--border);border-bottom:1px solid var(--border);">
+    <div class="section">
+      <div class="container">
+        <div class="section-header fade-up">
+          <span class="section-label">— Explora —</span>
+          <h2 class="section-title">Tipos de Horror</h2>
+          <p class="section-subtitle">¿Qué clase de oscuridad te atreve a explorar?</p>
+        </div>
+        <div class="categories-grid fade-up">
+          <a href="/historias?cat=aparicion" class="category-item"><span class="category-icon">👻</span><div class="category-name">Apariciones</div><div class="category-count">Espíritus y fantasmas</div></a>
+          <a href="/historias?cat=demonio" class="category-item"><span class="category-icon">😈</span><div class="category-name">Demonios</div><div class="category-count">Entidades oscuras</div></a>
+          <a href="/historias?cat=extraterrestre" class="category-item"><span class="category-icon">👽</span><div class="category-name">Extraterrestres</div><div class="category-count">Más allá del cielo</div></a>
+          <a href="/historias?cat=maldicion" class="category-item"><span class="category-icon">🪄</span><div class="category-name">Maldiciones</div><div class="category-count">Hechizos y brujas</div></a>
+          <a href="/historias?cat=paranormal" class="category-item"><span class="category-icon">🔮</span><div class="category-name">Paranormal</div><div class="category-count">Sin explicación</div></a>
+          <a href="/historias?cat=asesino" class="category-item"><span class="category-icon">🔪</span><div class="category-name">Terror Real</div><div class="category-count">Horror humano</div></a>
+          <a href="/historias?cat=suenos" class="category-item"><span class="category-icon">😴</span><div class="category-name">Sueños</div><div class="category-count">Pesadillas</div></a>
+          <a href="/historias?cat=otro" class="category-item"><span class="category-icon">❓</span><div class="category-name">Inexplicable</div><div class="category-count">Lo que no tiene nombre</div></a>
+        </div>
       </div>
     </div>
   </div>
 
-  <!-- CTA SECTION -->
-  <div style="text-align:center; padding: 6rem 2rem; background: radial-gradient(ellipse at center, #0d0000 0%, #050505 70%);">
-    <span class="section-eyebrow">— ¿Tienes algo que confesar? —</span>
-    <h2 style="font-family:'Creepster',cursive;font-size:clamp(2rem,5vw,4rem);color:var(--text-primary);text-shadow:var(--glow-red);margin:1rem 0 0.5rem;">
-      Comparte tu Terror
-    </h2>
-    <p style="color:var(--text-muted);font-style:italic;margin-bottom:2.5rem;font-size:1.1rem;">
-      "Lo que no se cuenta se pudre en el alma..."
-    </p>
-    <a href="/subir" class="btn-primary" style="font-size:1.1rem;padding:18px 48px;">
-      🩸 Confesar Ahora
-    </a>
+  <!-- CTA -->
+  <div class="section">
+    <div class="container" style="text-align:center;max-width:600px;">
+      <span class="section-label">— ¿Tienes algo que contar? —</span>
+      <h2 class="section-title" style="margin:0.75rem 0 1rem;">Tu historia merece ser escuchada</h2>
+      <p style="color:var(--text-2);margin-bottom:2rem;font-style:italic;">"Lo que no se cuenta se pudre en el alma. Compártelo. Libérate."</p>
+      <a href="/subir" class="btn btn-primary btn-lg">Escribir mi historia</a>
+    </div>
   </div>
 
   <!-- FOOTER -->
   <footer class="footer">
-    <div class="footer-logo">💀</div>
-    <p class="footer-tagline">Voces del Terror — Donde el miedo encuentra su voz</p>
-    <div class="footer-links">
-      <a href="/">Inicio</a>
-      <a href="/historias">Historias</a>
-      <a href="/subir">Subir Historia</a>
-    </div>
-    <div class="footer-bottom">
-      <p>⚠ Contenido perturbador. Solo para adultos. Las historias son experiencias personales de los usuarios.</p>
-      <p style="margin-top:0.5rem;color:#2a1a1a;">© 2024 Voces del Terror. Todos los derechos reservados al infierno.</p>
+    <div class="footer-inner">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <div class="footer-logo">💀 VOCES DEL TERROR</div>
+          <p>La plataforma donde las experiencias más oscuras encuentran su voz. Historias reales narradas por quienes las vivieron, con audio y evidencias fotográficas.</p>
+        </div>
+        <div class="footer-col">
+          <h4>Navegar</h4>
+          <ul>
+            <li><a href="/">Inicio</a></li>
+            <li><a href="/historias">Todas las historias</a></li>
+            <li><a href="/subir">Escribir historia</a></li>
+            <li><a href="/perfil">Mi perfil</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Categorías</h4>
+          <ul>
+            <li><a href="/historias?cat=aparicion">Apariciones</a></li>
+            <li><a href="/historias?cat=demonio">Demonios</a></li>
+            <li><a href="/historias?cat=paranormal">Paranormal</a></li>
+            <li><a href="/historias?cat=maldicion">Maldiciones</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>© 2024 Voces del Terror. Contenido publicado por usuarios. ⚠ Solo para adultos.</p>
+        <p>Construido con Firebase · Node.js</p>
+      </div>
     </div>
   </footer>
 
-  <!-- TOAST -->
-  <div class="toast-container" id="toastContainer"></div>
-
-  <!-- FIREBASE -->
   <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getFirestore, collection, getDocs, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { db } from '/js/firebase-config.js';
+    import { initAuth, doSignOut, toggleDropdown } from '/js/auth.js';
+    import { collection, getDocs, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-    const firebaseConfig = {
-      apiKey: "AIzaSyBKCSSMZE3ybpyP1MSegm4nu1GUGQt9oNc",
-      authDomain: "terror-6f51e.firebaseapp.com",
-      projectId: "terror-6f51e",
-      storageBucket: "terror-6f51e.firebasestorage.app",
-      messagingSenderId: "127086938530",
-      appId: "1:127086938530:web:bcd051bcf8766e9b214afb",
-      measurementId: "G-K3J8MKZQ94"
-    };
+    window.__so = doSignOut;
+    window.__td = toggleDropdown;
+    initAuth(() => {});
 
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
-    window.__db = db;
-
-    async function loadHomeData() {
+    async function loadHome() {
       try {
-        const q = query(collection(db, 'historias'), orderBy('createdAt', 'desc'), limit(6));
-        const snapshot = await getDocs(q);
-        const historias = [];
-        snapshot.forEach(doc => historias.push({ id: doc.id, ...doc.data() }));
+        const q    = query(collection(db,'historias'), orderBy('createdAt','desc'), limit(7));
+        const snap = await getDocs(q);
+        const all  = [];
+        snap.forEach(d => all.push({ id: d.id, ...d.data() }));
 
         // Stats
-        const allQ = await getDocs(collection(db, 'historias'));
-        let totalEvidencias = 0;
-        allQ.forEach(doc => {
-          const d = doc.data();
-          if (d.fotos && d.fotos.length) totalEvidencias += d.fotos.length;
+        const allSnap = await getDocs(collection(db,'historias'));
+        let totalEv = 0, authorsSet = new Set();
+        allSnap.forEach(d => {
+          const dat = d.data();
+          if (dat.fotos) totalEv += dat.fotos.length;
+          if (dat.autorId) authorsSet.add(dat.autorId);
         });
-        animateNumber('statHistorias', allQ.size);
-        animateNumber('statEvidencias', totalEvidencias);
+        animateCount('statHistorias', allSnap.size);
+        animateCount('statEvidencias', totalEv);
+        animateCount('statAutores', authorsSet.size || allSnap.size);
 
-        // Featured (first story)
-        const featuredContainer = document.getElementById('featuredContainer');
-        if (historias.length > 0) {
-          const feat = historias[0];
-          const imgHtml = feat.fotos && feat.fotos.length
-            ? `<img src="${feat.fotos[0]}" alt="${feat.titulo}" class="featured-image">`
-            : `<div class="featured-no-image">💀</div>`;
-          featuredContainer.innerHTML = `
-            <a href="/historia/${feat.id}" class="featured-story" style="text-decoration:none;color:inherit;">
+        // Featured
+        if (all.length > 0) {
+          const f = all[0];
+          const imgHtml = f.fotos && f.fotos.length
+            ? `<div class="featured-img"><img src="${f.fotos[0]}" alt="${f.titulo}" loading="lazy"><div class="featured-img-gradient" style="position:absolute;bottom:0;left:0;right:0;height:40%;background:linear-gradient(to top,var(--bg-card),transparent);"></div><span class="featured-badge">Destacado</span></div>`
+            : `<div class="featured-img"><div class="featured-img-placeholder">💀</div><span class="featured-badge">Destacado</span></div>`;
+          document.getElementById('featuredContainer').innerHTML = `
+            <a href="/historia/${f.id}" class="featured-card fade-up" style="margin-bottom:3rem;">
               ${imgHtml}
-              <div class="featured-content">
-                <div class="featured-category">${feat.categoria || 'Paranormal'}</div>
-                <h2 class="featured-title">${feat.titulo}</h2>
-                <p class="featured-excerpt">${(feat.historia || '').substring(0, 200)}...</p>
-                <div style="display:flex;gap:1rem;align-items:center;">
-                  <span class="btn-primary" style="display:inline-block;">Leer Historia</span>
-                  ${feat.fotos && feat.fotos.length ? `<span style="font-family:'Special Elite',cursive;font-size:0.75rem;color:var(--text-muted);">📸 ${feat.fotos.length} evidencias</span>` : ''}
+              <div class="featured-body">
+                <div class="featured-category">${f.categoria||'Paranormal'}</div>
+                <h2 class="featured-title">${f.titulo}</h2>
+                <p class="featured-excerpt">${(f.historia||'').substring(0,200)}...</p>
+                <div class="featured-meta">
+                  <span>Por ${f.autor||f.autorNombre||'Anónimo'}</span>
+                  ${f.fotos&&f.fotos.length?`<span>📸 ${f.fotos.length} evidencias</span>`:''}
+                </div>
+                <div style="margin-top:1.5rem;">
+                  <span class="btn btn-primary">Leer historia →</span>
                 </div>
               </div>
             </a>`;
         }
 
-        // Stories grid (skip first one for featured)
+        // Grid (skip first)
         const grid = document.getElementById('storiesGrid');
-        const rest = historias.length > 1 ? historias.slice(1) : historias;
+        const rest = all.slice(1, 7);
         if (rest.length === 0) {
           grid.innerHTML = `<div class="empty-state" style="grid-column:1/-1">
-            <span class="empty-state-icon">👻</span>
-            <h3>Las sombras aún están vacías...</h3>
-            <p style="margin-top:1rem;"><a href="/subir" class="btn-primary">Sé el primero en confesar</a></p>
+            <div class="empty-icon">📖</div>
+            <h3 class="empty-title">Las sombras están vacías</h3>
+            <p class="empty-sub">Sé el primero en confesar tu terror.</p>
+            <a href="/subir" class="btn btn-primary" style="margin-top:1rem;">Escribir primera historia</a>
           </div>`;
         } else {
-          grid.innerHTML = rest.map(h => buildCard(h)).join('');
+          grid.innerHTML = rest.map(buildCard).join('');
+          setTimeout(() => document.querySelectorAll('.fade-up').forEach(el => { const obs = new IntersectionObserver(e => { if(e[0].isIntersecting){el.classList.add('visible');obs.unobserve(el);} },{threshold:0.1}); obs.observe(el); }), 100);
         }
-
-      } catch (e) {
+      } catch(e) {
         console.error(e);
         document.getElementById('storiesGrid').innerHTML = `<div class="empty-state" style="grid-column:1/-1">
-          <span class="empty-state-icon">⚠️</span>
-          <h3>Error al cargar historias</h3>
-          <p style="color:var(--text-muted);font-size:0.9rem;margin-top:0.5rem;">Configura las reglas de Firestore en Firebase Console.</p>
+          <div class="empty-icon">⚠️</div>
+          <h3 class="empty-title">Sin conexión a Firebase</h3>
+          <p class="empty-sub" style="max-width:400px;margin:0 auto;">Activa Firestore en Firebase Console y configura las reglas de acceso público.</p>
         </div>`;
       }
     }
 
     function buildCard(h) {
       const imgHtml = h.fotos && h.fotos.length
-        ? `<img src="${h.fotos[0]}" alt="${h.titulo}" class="card-image" loading="lazy">`
-        : `<div class="card-no-image">💀</div>`;
-      const dateStr = h.createdAt ? new Date(h.createdAt.seconds * 1000).toLocaleDateString('es-ES', {day:'numeric',month:'short',year:'numeric'}) : '';
+        ? `<div class="card-img"><img src="${h.fotos[0]}" alt="${h.titulo}" loading="lazy"><span class="card-category-badge">${h.categoria||'Otro'}</span><span class="card-audio-badge">▶ Audio</span></div>`
+        : `<div class="card-img"><div class="card-img-placeholder">💀</div><span class="card-category-badge">${h.categoria||'Otro'}</span></div>`;
+      const date = h.createdAt ? new Date(h.createdAt.seconds*1000).toLocaleDateString('es-ES',{day:'numeric',month:'short'}) : '';
       return `
-        <a href="/historia/${h.id}" class="story-card fade-in">
+        <a href="/historia/${h.id}" class="story-card fade-up">
           ${imgHtml}
-          <div class="card-content">
-            <div class="card-category">${h.categoria || 'Paranormal'}</div>
+          <div class="card-body">
             <h3 class="card-title">${h.titulo}</h3>
-            <p class="card-excerpt">${(h.historia || '').substring(0, 150)}...</p>
-            <div class="card-meta">
-              <span>Por ${h.autor || 'Anónimo'}</span>
-              <span>${dateStr}</span>
+            <p class="card-excerpt">${(h.historia||'').substring(0,130)}...</p>
+            <div class="card-footer">
+              <div class="card-avatar"><span>${(h.autor||h.autorNombre||'?')[0].toUpperCase()}</span></div>
+              <span class="card-author">${h.autor||h.autorNombre||'Anónimo'}</span>
+              <span class="card-meta-right">
+                <span class="card-stat">👁 ${h.views||0}</span>
+                <span class="card-stat">🩸 ${h.likes||0}</span>
+                <span>${date}</span>
+              </span>
             </div>
-            <div class="mini-player" onclick="event.preventDefault(); playCardAudio('${h.id}', \`${h.titulo}\`, \`${(h.historia||'').substring(0,300).replace(/`/g,'\'')}\`)">
-              <button class="mini-play" id="miniplay-${h.id}">▶</button>
+            <div class="card-audio-row" onclick="event.preventDefault();playCardAudio('${h.id}','${h.titulo.replace(/'/g,"\\'")}','${(h.historia||'').substring(0,300).replace(/'/g,"\\'").replace(/\n/g,' ')}')">
+              <button class="mini-play-btn" id="miniplay-${h.id}">▶</button>
               <div class="mini-wave" id="miniwave-${h.id}">
-                <span style="height:8px"></span><span style="height:14px"></span><span style="height:10px"></span><span style="height:16px"></span><span style="height:8px"></span>
+                <span style="height:5px"></span><span style="height:12px"></span><span style="height:8px"></span><span style="height:15px"></span><span style="height:7px"></span>
               </div>
-              <span style="font-family:'Special Elite',cursive;font-size:0.65rem;color:#9b59b6;letter-spacing:1px;">ESCUCHAR</span>
+              <span class="mini-wave-label">Escuchar</span>
             </div>
           </div>
         </a>`;
     }
 
-    function animateNumber(id, target) {
+    function animateCount(id, target) {
       const el = document.getElementById(id);
-      if (!el || target === 0) return;
-      let current = 0;
-      const step = Math.max(1, Math.floor(target / 40));
-      const timer = setInterval(() => {
-        current = Math.min(current + step, target);
-        el.textContent = current;
-        if (current >= target) clearInterval(timer);
-      }, 50);
+      if (!el || target === 0) { if(el) el.textContent = '0'; return; }
+      let cur = 0;
+      const step = Math.max(1, Math.ceil(target / 40));
+      const t = setInterval(() => { cur = Math.min(cur + step, target); el.textContent = cur; if(cur >= target) clearInterval(t); }, 40);
     }
 
-    loadHomeData();
+    loadHome();
   </script>
-
   <script src="/js/main.js"></script>
   <script src="/js/audio.js"></script>
 </body>

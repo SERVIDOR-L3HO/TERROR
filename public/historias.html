@@ -3,202 +3,215 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Historias de Terror — VOCES DEL TERROR</title>
+  <title>Historias de Terror — Voces del Terror</title>
   <link rel="stylesheet" href="/css/styles.css">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💀</text></svg>">
 </head>
 <body>
-
   <div class="loading-overlay" id="loadingOverlay">
     <div class="loading-logo">💀</div>
     <div class="loading-bar"><div class="loading-bar-fill"></div></div>
   </div>
 
-  <div class="particles-container" id="particles"></div>
-
   <nav class="navbar">
-    <a href="/" class="nav-logo">💀 <span>VOCES</span> DEL TERROR</a>
+    <a href="/" class="nav-logo">💀 <span class="blood">VOCES</span> DEL TERROR</a>
     <ul class="nav-links" id="navLinks">
       <li><a href="/">Inicio</a></li>
-      <li><a href="/historias">Historias</a></li>
-      <li><a href="/subir" class="btn-nav">+ Confesar</a></li>
+      <li><a href="/historias" class="active">Historias</a></li>
+      <li><a href="/subir">Escribir</a></li>
     </ul>
-    <button class="hamburger" id="hamburger"><span></span><span></span><span></span></button>
+    <div id="navLoginArea" style="display:flex;gap:8px;align-items:center;flex-shrink:0;">
+      <a href="/login" class="nav-btn outline">Entrar</a>
+      <a href="/login?tab=registro" class="nav-btn">Registro</a>
+    </div>
+    <div id="navUserArea" class="nav-user" style="display:none;flex-shrink:0;">
+      <div class="nav-avatar" onclick="window.__td&&window.__td()">
+        <img id="navAvatarImg" src="" alt="" style="display:none;width:100%;height:100%;object-fit:cover;">
+        <span id="navAvatarInit"></span>
+      </div>
+      <div class="nav-dropdown" id="navDropdown">
+        <div class="nav-dropdown-header">
+          <div class="nav-dropdown-name" id="navDropdownName"></div>
+          <div class="nav-dropdown-email" id="navDropdownEmail"></div>
+        </div>
+        <a href="/perfil">👤 Mi Perfil</a>
+        <a href="/subir">✍ Nueva Historia</a>
+        <div class="nav-dropdown-divider"></div>
+        <button onclick="window.__so&&window.__so()" class="danger">⬅ Cerrar Sesión</button>
+      </div>
+    </div>
+    <button class="hamburger" id="hamburger" aria-label="Menú"><span></span><span></span><span></span></button>
   </nav>
 
   <div class="page-header">
-    <span class="section-eyebrow">— El Archivo del Horror —</span>
-    <h1>Todas las Historias</h1>
-    <p>Cada confesión es real. Cada sombra tiene nombre.</p>
+    <div class="page-header-inner">
+      <span class="section-label">— El Archivo —</span>
+      <h1>Todas las Historias</h1>
+      <p>Cada confesión fue vivida. Cada sombra tiene nombre.</p>
+    </div>
   </div>
 
   <div class="section">
-    <!-- FILTER BAR -->
-    <div class="filter-bar fade-in">
-      <input type="text" class="search-input" id="searchInput" placeholder="🔍 Buscar en las sombras...">
-      <button class="filter-btn active" data-cat="all">Todas</button>
-      <button class="filter-btn" data-cat="aparicion">👻 Apariciones</button>
-      <button class="filter-btn" data-cat="demonio">😈 Demonios</button>
-      <button class="filter-btn" data-cat="extraterrestre">👽 Extraterrestres</button>
-      <button class="filter-btn" data-cat="maldicion">🪄 Maldiciones</button>
-      <button class="filter-btn" data-cat="paranormal">🔮 Paranormal</button>
-      <button class="filter-btn" data-cat="asesino">🔪 Asesinos</button>
-      <button class="filter-btn" data-cat="suenos">😴 Sueños</button>
-      <button class="filter-btn" data-cat="otro">❓ Otro</button>
-    </div>
+    <div class="container">
 
-    <!-- SORT BAR -->
-    <div style="display:flex;gap:1rem;align-items:center;margin-bottom:2rem;flex-wrap:wrap;">
-      <span style="font-family:'Special Elite',cursive;font-size:0.75rem;letter-spacing:2px;color:var(--text-muted);text-transform:uppercase;">Ordenar:</span>
-      <button class="filter-btn active" data-sort="reciente">Más Recientes</button>
-      <button class="filter-btn" data-sort="antiguo">Más Antiguos</button>
-      <div id="resultsCount" style="margin-left:auto;font-family:'Special Elite',cursive;font-size:0.75rem;color:var(--text-muted);letter-spacing:2px;"></div>
-    </div>
-
-    <!-- STORIES -->
-    <div class="stories-grid" id="storiesGrid">
-      <div class="empty-state" style="grid-column:1/-1">
-        <span class="empty-state-icon">⏳</span>
-        <h3>Invocando historias...</h3>
+      <!-- FILTER BAR -->
+      <div class="filter-bar fade-up">
+        <input type="text" id="searchInput" class="filter-search" placeholder="Buscar historias...">
+        <button class="filter-chip active" data-cat="all">Todas</button>
+        <button class="filter-chip" data-cat="aparicion">👻 Apariciones</button>
+        <button class="filter-chip" data-cat="demonio">😈 Demonios</button>
+        <button class="filter-chip" data-cat="extraterrestre">👽 Extraterrestres</button>
+        <button class="filter-chip" data-cat="maldicion">🪄 Maldiciones</button>
+        <button class="filter-chip" data-cat="paranormal">🔮 Paranormal</button>
+        <button class="filter-chip" data-cat="asesino">🔪 Terror Real</button>
+        <button class="filter-chip" data-cat="suenos">😴 Sueños</button>
+        <button class="filter-chip" data-cat="otro">❓ Otro</button>
       </div>
-    </div>
 
-    <!-- LOAD MORE -->
-    <div style="text-align:center;margin-top:3rem;">
-      <button id="loadMoreBtn" class="btn-secondary" style="display:none;">Cargar más historias...</button>
+      <!-- SORT + COUNT -->
+      <div style="display:flex;align-items:center;gap:0.75rem;flex-wrap:wrap;margin-bottom:1.5rem;">
+        <span style="font-size:0.78rem;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--text-3);">Ordenar:</span>
+        <button class="filter-chip active" data-sort="reciente">Más recientes</button>
+        <button class="filter-chip" data-sort="populares">Más populares</button>
+        <button class="filter-chip" data-sort="antiguos">Más antiguos</button>
+        <div class="filter-right">
+          <span class="filter-count" id="resultsCount"></span>
+          <a href="/subir" class="btn btn-primary btn-sm">+ Escribir</a>
+        </div>
+      </div>
+
+      <!-- GRID -->
+      <div class="stories-grid" id="storiesGrid">
+        <div class="empty-state" style="grid-column:1/-1">
+          <div class="empty-icon">⏳</div>
+          <p class="empty-sub">Invocando historias...</p>
+        </div>
+      </div>
+
+      <!-- LOAD MORE -->
+      <div style="text-align:center;margin-top:2rem;" id="loadMoreContainer" style="display:none;"></div>
     </div>
   </div>
 
   <footer class="footer">
-    <div class="footer-logo">💀</div>
-    <p class="footer-tagline">Voces del Terror</p>
-    <div class="footer-links">
-      <a href="/">Inicio</a>
-      <a href="/subir">Subir Historia</a>
-    </div>
-    <div class="footer-bottom">
-      <p>⚠ Contenido perturbador para adultos.</p>
+    <div class="footer-inner">
+      <div class="footer-bottom">
+        <p>© 2024 Voces del Terror — Contenido publicado por usuarios.</p>
+        <p><a href="/">Inicio</a> · <a href="/subir">Escribir</a></p>
+      </div>
     </div>
   </footer>
 
-  <div class="toast-container" id="toastContainer"></div>
-
   <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getFirestore, collection, getDocs, query, orderBy, where } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { db } from '/js/firebase-config.js';
+    import { initAuth, doSignOut, toggleDropdown } from '/js/auth.js';
+    import { collection, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-    const firebaseConfig = {
-      apiKey: "AIzaSyBKCSSMZE3ybpyP1MSegm4nu1GUGQt9oNc",
-      authDomain: "terror-6f51e.firebaseapp.com",
-      projectId: "terror-6f51e",
-      storageBucket: "terror-6f51e.firebasestorage.app",
-      messagingSenderId: "127086938530",
-      appId: "1:127086938530:web:bcd051bcf8766e9b214afb",
-      measurementId: "G-K3J8MKZQ94"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
-    window.__db = db;
+    window.__so = doSignOut;
+    window.__td = toggleDropdown;
+    initAuth(() => {});
 
     let allHistorias = [];
-    let currentCat = 'all';
+    let currentCat  = new URLSearchParams(window.location.search).get('cat') || 'all';
     let currentSort = 'reciente';
-    let searchTerm = '';
+    let searchTerm  = '';
 
-    // Read URL params
-    const urlParams = new URLSearchParams(window.location.search);
-    if (urlParams.get('cat')) currentCat = urlParams.get('cat');
+    // Sync active chip with URL param
+    if (currentCat !== 'all') {
+      document.querySelectorAll('.filter-chip[data-cat]').forEach(b => {
+        b.classList.toggle('active', b.dataset.cat === currentCat);
+      });
+    }
 
     async function loadAll() {
       try {
-        const q = query(collection(db, 'historias'), orderBy('createdAt', 'desc'));
+        const q    = query(collection(db,'historias'), orderBy('createdAt','desc'));
         const snap = await getDocs(q);
         allHistorias = [];
-        snap.forEach(doc => allHistorias.push({ id: doc.id, ...doc.data() }));
+        snap.forEach(d => allHistorias.push({ id: d.id, ...d.data() }));
         applyFilters();
       } catch(e) {
-        console.error(e);
         document.getElementById('storiesGrid').innerHTML = `<div class="empty-state" style="grid-column:1/-1">
-          <span class="empty-state-icon">⚠️</span>
-          <h3>Error al cargar</h3>
-          <p style="color:var(--text-muted);font-size:0.9rem;margin-top:0.5rem;">Configura las reglas de Firestore en Firebase Console (modo lectura pública).</p>
+          <div class="empty-icon">⚠️</div>
+          <h3 class="empty-title">Error de conexión</h3>
+          <p class="empty-sub">Activa Firestore en Firebase Console y configura las reglas de acceso.</p>
         </div>`;
       }
     }
 
     function applyFilters() {
-      let filtered = [...allHistorias];
-      if (currentCat !== 'all') filtered = filtered.filter(h => (h.categoria||'otro') === currentCat);
+      let list = [...allHistorias];
+      if (currentCat !== 'all') list = list.filter(h => (h.categoria||'otro') === currentCat);
       if (searchTerm) {
         const s = searchTerm.toLowerCase();
-        filtered = filtered.filter(h =>
+        list = list.filter(h =>
           (h.titulo||'').toLowerCase().includes(s) ||
           (h.historia||'').toLowerCase().includes(s) ||
-          (h.autor||'').toLowerCase().includes(s)
+          (h.autor||h.autorNombre||'').toLowerCase().includes(s)
         );
       }
-      if (currentSort === 'antiguo') filtered = filtered.reverse();
-      renderStories(filtered);
-      document.getElementById('resultsCount').textContent = `${filtered.length} confesiones`;
+      if (currentSort === 'populares') list.sort((a,b) => (b.likes||0)-(a.likes||0));
+      else if (currentSort === 'antiguos') list.reverse();
+      renderGrid(list);
+      document.getElementById('resultsCount').textContent = `${list.length} historia${list.length!==1?'s':''}`;
     }
 
-    function renderStories(list) {
+    function renderGrid(list) {
       const grid = document.getElementById('storiesGrid');
-      if (list.length === 0) {
+      if (!list.length) {
         grid.innerHTML = `<div class="empty-state" style="grid-column:1/-1">
-          <span class="empty-state-icon">👻</span>
-          <h3>Silencio...</h3>
-          <p style="color:var(--text-muted);">No hay historias que coincidan con tu búsqueda.</p>
-        </div>`;
-        return;
+          <div class="empty-icon">🔍</div>
+          <h3 class="empty-title">Sin resultados</h3>
+          <p class="empty-sub">Intenta con otra búsqueda o categoría.</p>
+        </div>`; return;
       }
       grid.innerHTML = list.map(h => {
         const imgHtml = h.fotos && h.fotos.length
-          ? `<img src="${h.fotos[0]}" alt="${h.titulo}" class="card-image" loading="lazy">`
-          : `<div class="card-no-image">💀</div>`;
-        const dateStr = h.createdAt ? new Date(h.createdAt.seconds * 1000).toLocaleDateString('es-ES', {day:'numeric',month:'short',year:'numeric'}) : '';
+          ? `<div class="card-img"><img src="${h.fotos[0]}" alt="${h.titulo}" loading="lazy"><span class="card-category-badge">${h.categoria||'Otro'}</span><span class="card-audio-badge">▶ Audio</span></div>`
+          : `<div class="card-img"><div class="card-img-placeholder">💀</div><span class="card-category-badge">${h.categoria||'Otro'}</span></div>`;
+        const date = h.createdAt ? new Date(h.createdAt.seconds*1000).toLocaleDateString('es-ES',{day:'numeric',month:'short',year:'numeric'}) : '';
+        const autor = h.autor || h.autorNombre || 'Anónimo';
         return `
-          <a href="/historia/${h.id}" class="story-card fade-in">
+          <a href="/historia/${h.id}" class="story-card fade-up">
             ${imgHtml}
-            <div class="card-content">
-              <div class="card-category">${h.categoria || 'Paranormal'}</div>
+            <div class="card-body">
               <h3 class="card-title">${h.titulo}</h3>
-              <p class="card-excerpt">${(h.historia || '').substring(0, 150)}...</p>
-              <div class="card-meta">
-                <span>Por ${h.autor || 'Anónimo'}</span>
-                <span>${dateStr}</span>
+              <p class="card-excerpt">${(h.historia||'').substring(0,140)}...</p>
+              <div class="card-footer">
+                <div class="card-avatar"><span>${autor[0].toUpperCase()}</span></div>
+                <span class="card-author">${autor}</span>
+                <span class="card-meta-right">
+                  <span class="card-stat">👁 ${h.views||0}</span>
+                  <span class="card-stat">🩸 ${h.likes||0}</span>
+                  <span>${date}</span>
+                </span>
               </div>
-              ${h.fotos && h.fotos.length ? `<div style="font-family:'Special Elite',cursive;font-size:0.7rem;color:var(--text-muted);margin-top:8px;">📸 ${h.fotos.length} evidencia(s)</div>` : ''}
-              <div class="mini-player" onclick="event.preventDefault(); playCardAudio('${h.id}', \`${h.titulo}\`, \`${(h.historia||'').substring(0,300).replace(/`/g,'\'')}\`)">
-                <button class="mini-play" id="miniplay-${h.id}">▶</button>
+              <div class="card-audio-row" onclick="event.preventDefault();playCardAudio('${h.id}','${(h.titulo||'').replace(/'/g,"\\'")}','${(h.historia||'').substring(0,300).replace(/'/g,"\\'").replace(/\n/g,' ')}')">
+                <button class="mini-play-btn" id="miniplay-${h.id}">▶</button>
                 <div class="mini-wave" id="miniwave-${h.id}">
-                  <span style="height:8px"></span><span style="height:14px"></span><span style="height:10px"></span><span style="height:16px"></span><span style="height:8px"></span>
+                  <span style="height:5px"></span><span style="height:12px"></span><span style="height:8px"></span><span style="height:15px"></span><span style="height:7px"></span>
                 </div>
-                <span style="font-family:'Special Elite',cursive;font-size:0.65rem;color:#9b59b6;letter-spacing:1px;">ESCUCHAR</span>
+                <span class="mini-wave-label">Escuchar</span>
               </div>
             </div>
           </a>`;
       }).join('');
-      // Trigger fade-in
-      setTimeout(() => document.querySelectorAll('.fade-in').forEach(el => el.classList.add('visible')), 50);
+      setTimeout(() => document.querySelectorAll('.fade-up:not(.visible)').forEach(el => el.classList.add('visible')), 50);
     }
 
-    // Event listeners
-    document.querySelectorAll('.filter-btn[data-cat]').forEach(btn => {
-      if (btn.dataset.cat === currentCat) { btn.classList.add('active'); }
-      else if (currentCat !== 'all') { btn.classList.remove('active'); }
+    // Filters
+    document.querySelectorAll('.filter-chip[data-cat]').forEach(btn => {
       btn.addEventListener('click', () => {
-        document.querySelectorAll('.filter-btn[data-cat]').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.filter-chip[data-cat]').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
         currentCat = btn.dataset.cat;
         applyFilters();
       });
     });
 
-    document.querySelectorAll('.filter-btn[data-sort]').forEach(btn => {
+    document.querySelectorAll('.filter-chip[data-sort]').forEach(btn => {
       btn.addEventListener('click', () => {
-        document.querySelectorAll('.filter-btn[data-sort]').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.filter-chip[data-sort]').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
         currentSort = btn.dataset.sort;
         applyFilters();
@@ -208,15 +221,11 @@
     let searchTimer;
     document.getElementById('searchInput').addEventListener('input', e => {
       clearTimeout(searchTimer);
-      searchTimer = setTimeout(() => {
-        searchTerm = e.target.value.trim();
-        applyFilters();
-      }, 300);
+      searchTimer = setTimeout(() => { searchTerm = e.target.value.trim(); applyFilters(); }, 280);
     });
 
     loadAll();
   </script>
-
   <script src="/js/main.js"></script>
   <script src="/js/audio.js"></script>
 </body>

@@ -3,427 +3,407 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Confesar Historia — VOCES DEL TERROR</title>
+  <title>Escribir Historia — Voces del Terror</title>
   <link rel="stylesheet" href="/css/styles.css">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💀</text></svg>">
-  <style>
-    .progress-upload {
-      width: 100%;
-      height: 4px;
-      background: #1a1a1a;
-      border-radius: 2px;
-      overflow: hidden;
-      margin-top: 1rem;
-      display: none;
-    }
-    .progress-upload-fill {
-      height: 100%;
-      background: linear-gradient(to right, var(--blood-red), var(--crimson));
-      width: 0%;
-      transition: width 0.3s;
-      box-shadow: var(--glow-red);
-    }
-    .char-count {
-      text-align: right;
-      font-family: 'Special Elite', cursive;
-      font-size: 0.75rem;
-      color: var(--text-muted);
-      margin-top: 4px;
-    }
-    .tip-box {
-      background: rgba(139,0,0,0.05);
-      border: 1px solid rgba(139,0,0,0.2);
-      border-left: 3px solid var(--blood-red);
-      padding: 1rem 1.5rem;
-      margin-bottom: 2rem;
-      font-size: 0.9rem;
-      color: var(--text-muted);
-      font-style: italic;
-    }
-    .step-indicator {
-      display: flex;
-      gap: 0;
-      margin-bottom: 3rem;
-    }
-    .step {
-      flex: 1;
-      text-align: center;
-      padding: 1rem 0.5rem;
-      font-family: 'Special Elite', cursive;
-      font-size: 0.7rem;
-      letter-spacing: 1px;
-      text-transform: uppercase;
-      color: var(--text-muted);
-      border-bottom: 2px solid #1a1a1a;
-      transition: all 0.3s;
-    }
-    .step.active {
-      color: var(--crimson);
-      border-color: var(--crimson);
-    }
-    .step.done {
-      color: #006400;
-      border-color: #006400;
-    }
-    .preview-text {
-      background: #050000;
-      border: 1px solid var(--card-border);
-      padding: 2rem;
-      font-family: 'Crimson Text', serif;
-      font-size: 1rem;
-      color: var(--text-muted);
-      font-style: italic;
-      min-height: 80px;
-      border-radius: 2px;
-      margin-top: 1rem;
-    }
-  </style>
 </head>
 <body>
-
   <div class="loading-overlay" id="loadingOverlay">
     <div class="loading-logo">💀</div>
     <div class="loading-bar"><div class="loading-bar-fill"></div></div>
   </div>
 
-  <div class="particles-container" id="particles"></div>
-
   <nav class="navbar">
-    <a href="/" class="nav-logo">💀 <span>VOCES</span> DEL TERROR</a>
+    <a href="/" class="nav-logo">💀 <span class="blood">VOCES</span> DEL TERROR</a>
     <ul class="nav-links" id="navLinks">
       <li><a href="/">Inicio</a></li>
       <li><a href="/historias">Historias</a></li>
-      <li><a href="/subir" class="btn-nav">+ Confesar</a></li>
+      <li><a href="/subir" class="active">Escribir</a></li>
     </ul>
-    <button class="hamburger" id="hamburger"><span></span><span></span><span></span></button>
+    <div id="navLoginArea" style="display:flex;gap:8px;align-items:center;flex-shrink:0;">
+      <a href="/login" class="nav-btn outline">Entrar</a>
+      <a href="/login?tab=registro" class="nav-btn">Registro</a>
+    </div>
+    <div id="navUserArea" class="nav-user" style="display:none;flex-shrink:0;">
+      <div class="nav-avatar" onclick="window.__td&&window.__td()">
+        <img id="navAvatarImg" src="" alt="" style="display:none;width:100%;height:100%;object-fit:cover;">
+        <span id="navAvatarInit"></span>
+      </div>
+      <div class="nav-dropdown" id="navDropdown">
+        <div class="nav-dropdown-header">
+          <div class="nav-dropdown-name" id="navDropdownName"></div>
+          <div class="nav-dropdown-email" id="navDropdownEmail"></div>
+        </div>
+        <a href="/perfil">👤 Mi Perfil</a>
+        <div class="nav-dropdown-divider"></div>
+        <button onclick="window.__so&&window.__so()" class="danger">⬅ Cerrar Sesión</button>
+      </div>
+    </div>
+    <button class="hamburger" id="hamburger" aria-label="Menú"><span></span><span></span><span></span></button>
   </nav>
 
   <div class="page-header">
-    <span class="section-eyebrow">— Abre tu alma —</span>
-    <h1>Confiesa tu Terror</h1>
-    <p>"Lo que viviste merece ser recordado... y temido"</p>
+    <div class="page-header-inner">
+      <span class="section-label" id="pageLabel">— Nueva Historia —</span>
+      <h1 id="pageTitle">Escribe tu Terror</h1>
+      <p id="pageSubtitle">"Lo que viviste merece ser recordado."</p>
+    </div>
   </div>
 
-  <div class="section">
-    <div class="upload-section">
-
-      <div class="step-indicator">
-        <div class="step active" id="step1">① Tu Historia</div>
-        <div class="step" id="step2">② Evidencias</div>
-        <div class="step" id="step3">③ Confirmar</div>
+  <!-- AUTH GUARD -->
+  <div id="authGuard" style="display:none;">
+    <div class="section">
+      <div class="container" style="text-align:center;max-width:500px;">
+        <div class="empty-icon" style="font-size:3rem;margin-bottom:1rem;">🔒</div>
+        <h2 style="font-family:'Playfair Display',serif;font-size:1.5rem;color:var(--text);margin-bottom:0.75rem;">Inicia sesión para continuar</h2>
+        <p style="color:var(--text-2);margin-bottom:1.5rem;">Debes tener una cuenta para publicar historias.</p>
+        <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
+          <a href="/login" class="btn btn-primary">Iniciar sesión</a>
+          <a href="/login?tab=registro" class="btn btn-secondary">Crear cuenta gratis</a>
+        </div>
       </div>
+    </div>
+  </div>
 
-      <div class="tip-box">
-        ⚠ Sé honesto. Las mejores historias son las verdaderas. Describe cada detalle, cada sonido, cada sensación. El miedo real no necesita adornos.
-      </div>
-
-      <form id="uploadForm">
-
-        <!-- TÍTULO -->
-        <div class="form-group">
-          <label class="form-label" for="titulo">Título de tu Historia <span>*</span></label>
-          <input type="text" id="titulo" class="form-input" placeholder="Dale un nombre a tu terror..." maxlength="100" required>
-          <div class="char-count"><span id="tituloCount">0</span>/100</div>
+  <!-- FORM -->
+  <div id="formContainer" style="display:none;">
+    <div class="section">
+      <div class="container-narrow">
+        <div class="steps" id="stepsBar">
+          <div class="step-item active" id="step1">① Básicos</div>
+          <div class="step-item" id="step2">② Historia</div>
+          <div class="step-item" id="step3">③ Evidencias</div>
+          <div class="step-item" id="step4">④ Audio</div>
         </div>
 
-        <!-- AUTOR -->
-        <div class="form-group">
-          <label class="form-label" for="autor">Tu Nombre <span>*</span></label>
-          <input type="text" id="autor" class="form-input" placeholder="¿Cómo quieres que te llamen? (puede ser un alias)" maxlength="50" required>
+        <div class="alert alert-warn" id="editingBanner" style="display:none;">
+          ✏ Estás editando una historia existente.
         </div>
 
-        <!-- CATEGORÍA -->
-        <div class="form-group">
-          <label class="form-label" for="categoria">Categoría <span>*</span></label>
-          <select id="categoria" class="form-select form-input" required>
-            <option value="">— Elige el tipo de horror —</option>
-            <option value="aparicion">👻 Aparición / Fantasma</option>
-            <option value="demonio">😈 Demonio / Entidad Oscura</option>
-            <option value="extraterrestre">👽 Extraterrestre / OVNI</option>
-            <option value="maldicion">🪄 Maldición / Brujería</option>
-            <option value="paranormal">🔮 Paranormal / Sin Explicación</option>
-            <option value="asesino">🔪 Asesino / Horror Real</option>
-            <option value="suenos">😴 Sueño / Pesadilla</option>
-            <option value="otro">❓ Otro</option>
-          </select>
-        </div>
+        <form class="form-section" id="uploadForm">
 
-        <!-- HISTORIA -->
-        <div class="form-group">
-          <label class="form-label" for="historia">Tu Historia <span>*</span></label>
-          <textarea id="historia" class="form-textarea" placeholder="Cuéntanos todo... cada detalle cuenta. ¿Cuándo ocurrió? ¿Dónde? ¿Qué viste, oíste, sentiste? No dejes nada fuera..." maxlength="10000" required style="min-height:350px;"></textarea>
-          <div class="char-count"><span id="historiaCount">0</span>/10,000 caracteres</div>
-        </div>
+          <!-- BÁSICOS -->
+          <div class="form-group">
+            <label class="form-label" for="titulo">Título <span class="req">*</span></label>
+            <input type="text" id="titulo" class="form-input" placeholder="Dale un título impactante a tu historia..." maxlength="100" required>
+            <div class="form-char"><span id="tituloCount">0</span>/100</div>
+          </div>
 
-        <!-- PREVIEW AUDIO -->
-        <div class="form-group">
-          <label class="form-label">Vista Previa de Audio</label>
-          <p style="font-size:0.85rem;color:var(--text-muted);margin-bottom:1rem;">Así sonará tu historia cuando otros la escuchen:</p>
-          <div class="audio-section">
-            <div class="audio-section-title">🎙 Narrador del Horror</div>
-            <div class="audio-controls">
-              <button type="button" class="audio-play-btn" id="previewPlayBtn" onclick="previewAudio()">▶</button>
-              <div class="audio-waveform" id="previewWaveform"></div>
-              <div class="audio-info">
-                <div class="audio-status" id="previewStatus">LISTO</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+            <div class="form-group" style="margin-bottom:0;">
+              <label class="form-label" for="autor">Nombre / Alias <span class="req">*</span></label>
+              <input type="text" id="autor" class="form-input" placeholder="¿Cómo te llaman?" maxlength="50" required>
+            </div>
+            <div class="form-group" style="margin-bottom:0;">
+              <label class="form-label" for="categoria">Categoría <span class="req">*</span></label>
+              <select id="categoria" class="form-select form-input" required>
+                <option value="">— Selecciona —</option>
+                <option value="aparicion">👻 Aparición / Fantasma</option>
+                <option value="demonio">😈 Demonio / Entidad</option>
+                <option value="extraterrestre">👽 Extraterrestre / OVNI</option>
+                <option value="maldicion">🪄 Maldición / Brujería</option>
+                <option value="paranormal">🔮 Paranormal</option>
+                <option value="asesino">🔪 Terror Real</option>
+                <option value="suenos">😴 Sueño / Pesadilla</option>
+                <option value="otro">❓ Otro</option>
+              </select>
+            </div>
+          </div>
+          <div style="height:1.5rem;"></div>
+
+          <!-- HISTORIA -->
+          <div class="form-group">
+            <label class="form-label" for="historia">Tu Historia <span class="req">*</span></label>
+            <div class="alert alert-info" style="margin-bottom:0.75rem;">
+              💡 Sé específico: ¿cuándo ocurrió? ¿dónde? ¿qué viste/oíste/sentiste? El detalle hace la diferencia.
+            </div>
+            <textarea id="historia" class="form-textarea" placeholder="Cuéntanos todo con detalle. No omitas nada. El miedo real no necesita adornos..." maxlength="10000" required style="min-height:320px;"></textarea>
+            <div class="form-char"><span id="historiaCount">0</span>/10,000</div>
+          </div>
+
+          <!-- EVIDENCIAS -->
+          <div class="form-group">
+            <label class="form-label">Evidencias Fotográficas <span style="font-weight:400;text-transform:none;font-size:0.75rem;color:var(--text-3);">(opcional · máx. 3 fotos)</span></label>
+            <p class="form-hint" style="margin-bottom:0.75rem;">Las imágenes se comprimen automáticamente en tu dispositivo — sin costo adicional.</p>
+            <div class="file-drop" id="dropArea">
+              <input type="file" id="fotosInput" accept="image/*" multiple>
+              <div class="file-drop-icon">📸</div>
+              <div class="file-drop-text"><strong>Arrastra tus fotos aquí</strong> o haz clic para seleccionar</div>
+              <div class="file-drop-hint">JPG · PNG · WEBP — automáticamente comprimidas</div>
+            </div>
+            <div class="images-preview" id="previewContainer"></div>
+            <div class="upload-progress" id="uploadProgress"><div class="upload-progress-fill" id="uploadProgressFill"></div></div>
+          </div>
+
+          <!-- PREVIEW AUDIO -->
+          <div class="form-group">
+            <label class="form-label">Vista previa de Audio</label>
+            <p class="form-hint" style="margin-bottom:0.75rem;">Así sonará tu historia para los oyentes. Selecciona una voz y haz clic en reproducir.</p>
+            <div class="audio-player">
+              <div class="audio-player-header">
+                <div class="audio-icon">🎙</div>
+                <div><div class="audio-player-title">Narrador del Terror</div><div class="audio-player-sub">Síntesis de voz del navegador</div></div>
               </div>
-            </div>
-            <select class="voice-select" id="voiceSelect">
-              <option value="">Voz automática del sistema</option>
-            </select>
-          </div>
-        </div>
-
-        <!-- FOTOS -->
-        <div class="form-group" id="step2Content">
-          <label class="form-label">Evidencias Fotográficas <span style="color:var(--text-muted);font-size:0.75rem;">(Opcional — máx. 3 fotos)</span></label>
-          <p style="font-size:0.85rem;color:var(--text-muted);margin-bottom:1rem;">Sube fotos que respalden tu historia. Se comprimen automáticamente, sin costo extra.</p>
-
-          <div class="file-upload-area" id="dropArea">
-            <input type="file" id="fotosInput" accept="image/*" multiple>
-            <span class="upload-icon">📸</span>
-            <div class="upload-text">
-              <strong>Arrastra tus evidencias aquí</strong><br>
-              o haz clic para seleccionar<br>
-              <small style="color:#2a1a1a;">JPG, PNG, WEBP — máx. 3 fotos · se comprimen automáticamente</small>
+              <div class="audio-controls-row">
+                <button type="button" class="audio-play-btn" id="previewPlayBtn" onclick="previewAudio()">▶</button>
+                <div class="audio-waveform" id="previewWaveform"></div>
+                <span class="audio-status-text" id="previewStatus">Listo</span>
+              </div>
+              <select class="voice-picker" id="voiceSelect"></select>
             </div>
           </div>
 
-          <div class="image-preview-container" id="previewContainer"></div>
-
-          <div class="progress-upload" id="uploadProgress">
-            <div class="progress-upload-fill" id="uploadProgressFill"></div>
+          <!-- TÉRMINOS -->
+          <div class="form-group">
+            <label class="form-checkbox">
+              <input type="checkbox" id="terminos" required>
+              <span>Confirmo que esta historia es real o está basada en eventos reales, y acepto que sea publicada públicamente en Voces del Terror.</span>
+            </label>
           </div>
-        </div>
 
-        <!-- TÉRMINOS -->
-        <div class="form-group">
-          <label style="display:flex;align-items:center;gap:12px;cursor:pointer;">
-            <input type="checkbox" id="terminos" required style="width:18px;height:18px;cursor:pointer;accent-color:var(--crimson);">
-            <span style="font-size:0.9rem;color:var(--text-muted);">
-              Confirmo que esta historia es real o está basada en eventos reales, y acepto que sea publicada en Voces del Terror.
-            </span>
-          </label>
-        </div>
-
-        <!-- SUBMIT -->
-        <button type="submit" class="btn-submit" id="submitBtn">
-          🩸 Confesar mi Terror
-        </button>
-
-        <div id="submitStatus" style="text-align:center;margin-top:1rem;font-family:'Special Elite',cursive;font-size:0.85rem;color:var(--text-muted);display:none;"></div>
-
-      </form>
+          <!-- SUBMIT -->
+          <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+            <button type="submit" class="btn btn-primary btn-lg" id="submitBtn" style="flex:1;">
+              Publicar Historia
+            </button>
+            <a href="/historias" class="btn btn-ghost">Cancelar</a>
+          </div>
+          <p id="submitStatus" style="text-align:center;margin-top:1rem;font-size:0.85rem;color:var(--text-3);display:none;"></p>
+        </form>
+      </div>
     </div>
   </div>
 
   <footer class="footer">
-    <div class="footer-logo">💀</div>
-    <p class="footer-tagline">Voces del Terror</p>
-    <div class="footer-bottom">
-      <p>⚠ Contenido perturbador para adultos.</p>
+    <div class="footer-inner">
+      <div class="footer-bottom"><p>© 2024 Voces del Terror</p></div>
     </div>
   </footer>
 
-  <div class="toast-container" id="toastContainer"></div>
-
   <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { db } from '/js/firebase-config.js';
+    import { initAuth, doSignOut, toggleDropdown, currentUser as authUser } from '/js/auth.js';
+    import {
+      collection, addDoc, doc, getDoc, updateDoc, serverTimestamp
+    } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-    const firebaseConfig = {
-      apiKey: "AIzaSyBKCSSMZE3ybpyP1MSegm4nu1GUGQt9oNc",
-      authDomain: "terror-6f51e.firebaseapp.com",
-      projectId: "terror-6f51e",
-      storageBucket: "terror-6f51e.firebasestorage.app",
-      messagingSenderId: "127086938530",
-      appId: "1:127086938530:web:bcd051bcf8766e9b214afb",
-      measurementId: "G-K3J8MKZQ94"
-    };
+    window.__so = doSignOut;
+    window.__td = toggleDropdown;
 
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
-    window.__db = db;
+    const urlParams = new URLSearchParams(window.location.search);
+    const editId    = urlParams.get('editar');
+    let   editData  = null;
+    let   currentAuthUser = null;
+    let   selectedFiles   = [];
 
-    let selectedFiles = [];
+    initAuth(async user => {
+      currentAuthUser = user;
+      if (!user) {
+        document.getElementById('formContainer').style.display = 'none';
+        document.getElementById('authGuard').style.display = 'block';
+        return;
+      }
+      document.getElementById('formContainer').style.display = 'block';
+      document.getElementById('authGuard').style.display = 'none';
 
-    // ── Comprimir imagen en canvas → base64 (gratis, sin Storage) ──
-    function compressImage(file, maxWidth = 900, quality = 0.65) {
-      return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = ev => {
-          const img = new Image();
-          img.onload = () => {
-            const scale = Math.min(1, maxWidth / img.width);
-            const canvas = document.createElement('canvas');
-            canvas.width  = Math.round(img.width  * scale);
-            canvas.height = Math.round(img.height * scale);
-            const ctx = canvas.getContext('2d');
-            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-            resolve(canvas.toDataURL('image/jpeg', quality));
-          };
-          img.onerror = reject;
-          img.src = ev.target.result;
-        };
-        reader.onerror = reject;
-        reader.readAsDataURL(file);
-      });
+      // Pre-fill author from profile
+      document.getElementById('autor').value = user.displayName || user.email.split('@')[0];
+
+      // Edit mode
+      if (editId) await loadForEdit(editId, user);
+    });
+
+    async function loadForEdit(id, user) {
+      try {
+        const snap = await getDoc(doc(db,'historias',id));
+        if (!snap.exists()) { window.showToast('Historia no encontrada.','error'); return; }
+        editData = snap.data();
+        if (editData.autorId !== user.uid) { window.showToast('No tienes permiso para editar esta historia.','error'); return; }
+
+        // Update UI for edit mode
+        document.getElementById('pageLabel').textContent = '— Editando Historia —';
+        document.getElementById('pageTitle').textContent  = 'Editar Historia';
+        document.getElementById('pageSubtitle').textContent = 'Revisa y actualiza tu confesión.';
+        document.getElementById('editingBanner').style.display = 'flex';
+        document.getElementById('submitBtn').textContent = 'Guardar Cambios';
+        document.getElementById('terminos').closest('div').style.display = 'none';
+        document.getElementById('terminos').removeAttribute('required');
+
+        // Pre-fill fields
+        document.getElementById('titulo').value    = editData.titulo    || '';
+        document.getElementById('autor').value     = editData.autor     || editData.autorNombre || '';
+        document.getElementById('categoria').value = editData.categoria || '';
+        document.getElementById('historia').value  = editData.historia  || '';
+        document.getElementById('tituloCount').textContent   = (editData.titulo||'').length;
+        document.getElementById('historiaCount').textContent = (editData.historia||'').length;
+
+        // Show existing photos
+        if (editData.fotos && editData.fotos.length) {
+          const container = document.getElementById('previewContainer');
+          editData.fotos.forEach((src, i) => {
+            const item = document.createElement('div');
+            item.className = 'img-preview-item';
+            item.id = `existing-${i}`;
+            item.innerHTML = `<img src="${src}" alt="Foto ${i+1}"><button type="button" class="img-preview-remove" onclick="removeExisting(${i})">✕</button>`;
+            container.appendChild(item);
+          });
+        }
+      } catch(e) { window.showToast('Error al cargar: '+e.message,'error'); }
     }
+
+    let removedExistingIndexes = [];
+    window.removeExisting = function(idx) {
+      removedExistingIndexes.push(idx);
+      document.getElementById(`existing-${idx}`)?.remove();
+    };
 
     // Char counters
     document.getElementById('titulo').addEventListener('input', function() {
       document.getElementById('tituloCount').textContent = this.value.length;
+      if (this.value.length > 3) document.getElementById('step1').classList.add('done');
     });
     document.getElementById('historia').addEventListener('input', function() {
       document.getElementById('historiaCount').textContent = this.value.length.toLocaleString();
-      if (this.value.length > 50) {
-        document.getElementById('step1').classList.add('done');
-        document.getElementById('step2').classList.add('active');
-      }
+      if (this.value.length > 50) { document.getElementById('step2').classList.add('done'); document.getElementById('step3').classList.add('active'); }
     });
 
-    // File drop area
-    const dropArea  = document.getElementById('dropArea');
+    // File drop
+    const dropArea   = document.getElementById('dropArea');
     const fotosInput = document.getElementById('fotosInput');
-
     dropArea.addEventListener('dragover', e => { e.preventDefault(); dropArea.classList.add('dragover'); });
     dropArea.addEventListener('dragleave', () => dropArea.classList.remove('dragover'));
-    dropArea.addEventListener('drop', e => {
-      e.preventDefault();
-      dropArea.classList.remove('dragover');
-      addFiles(Array.from(e.dataTransfer.files));
-    });
+    dropArea.addEventListener('drop', e => { e.preventDefault(); dropArea.classList.remove('dragover'); addFiles(Array.from(e.dataTransfer.files)); });
     fotosInput.addEventListener('change', () => addFiles(Array.from(fotosInput.files)));
 
     function addFiles(files) {
       const imageFiles = files.filter(f => f.type.startsWith('image/'));
-      const remaining  = 3 - selectedFiles.length;   // máx 3 para no superar límite de Firestore
-      const toAdd      = imageFiles.slice(0, remaining);
-
-      if (imageFiles.length > remaining) {
-        localToast('⚠ Máximo 3 imágenes permitidas', 'error');
-      }
-
-      toAdd.forEach(file => {
-        if (file.size > 15 * 1024 * 1024) {
-          localToast(`⚠ ${file.name} es demasiado grande`, 'error');
-          return;
-        }
+      const remaining  = 3 - selectedFiles.length;
+      if (imageFiles.length > remaining) window.showToast('⚠ Máximo 3 imágenes permitidas.','error');
+      imageFiles.slice(0, remaining).forEach(file => {
         selectedFiles.push(file);
-        // Preview sin comprimir (solo visual)
         const reader = new FileReader();
         reader.onload = ev => addPreview(ev.target.result, selectedFiles.length - 1);
         reader.readAsDataURL(file);
       });
-
-      if (selectedFiles.length > 0) {
-        document.getElementById('step2').classList.add('done');
-        document.getElementById('step3').classList.add('active');
-      }
+      if (selectedFiles.length > 0) { document.getElementById('step3').classList.add('done'); document.getElementById('step4').classList.add('active'); }
     }
 
     function addPreview(src, idx) {
       const container = document.getElementById('previewContainer');
       const item = document.createElement('div');
-      item.className = 'image-preview-item';
-      item.id = `preview-${idx}`;
-      item.innerHTML = `
-        <img src="${src}" alt="Evidencia ${idx+1}">
-        <button type="button" class="image-preview-remove" onclick="removeFile(${idx})">✕</button>
-      `;
+      item.className = 'img-preview-item'; item.id = `preview-${idx}`;
+      item.innerHTML = `<img src="${src}" alt="Foto ${idx+1}"><button type="button" class="img-preview-remove" onclick="removeFile(${idx})">✕</button>`;
       container.appendChild(item);
     }
 
     window.removeFile = function(idx) {
       selectedFiles.splice(idx, 1);
       document.getElementById('previewContainer').innerHTML = '';
-      selectedFiles.forEach((f, i) => {
+      removedExistingIndexes = [];
+      if (editData && editData.fotos) {
+        editData.fotos.forEach((src, i) => {
+          const item = document.createElement('div');
+          item.className = 'img-preview-item'; item.id = `existing-${i}`;
+          item.innerHTML = `<img src="${src}" alt="Foto ${i+1}"><button type="button" class="img-preview-remove" onclick="removeExisting(${i})">✕</button>`;
+          document.getElementById('previewContainer').appendChild(item);
+        });
+      }
+      selectedFiles.forEach((_, i) => {
         const reader = new FileReader();
         reader.onload = ev => addPreview(ev.target.result, i);
-        reader.readAsDataURL(f);
+        reader.readAsDataURL(selectedFiles[i]);
       });
     };
 
-    // ── SUBMIT ──
+    // Compress image with canvas
+    function compressImage(file, maxW = 900, q = 0.68) {
+      return new Promise((res, rej) => {
+        const reader = new FileReader();
+        reader.onload = ev => {
+          const img = new Image();
+          img.onload = () => {
+            const scale = Math.min(1, maxW / img.width);
+            const canvas = document.createElement('canvas');
+            canvas.width  = Math.round(img.width  * scale);
+            canvas.height = Math.round(img.height * scale);
+            canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+            res(canvas.toDataURL('image/jpeg', q));
+          };
+          img.onerror = rej; img.src = ev.target.result;
+        };
+        reader.onerror = rej; reader.readAsDataURL(file);
+      });
+    }
+
+    // SUBMIT
     document.getElementById('uploadForm').addEventListener('submit', async e => {
       e.preventDefault();
-
       const titulo    = document.getElementById('titulo').value.trim();
       const autor     = document.getElementById('autor').value.trim();
       const categoria = document.getElementById('categoria').value;
       const historia  = document.getElementById('historia').value.trim();
 
-      if (!titulo || !autor || !categoria || !historia) {
-        localToast('⚠ Completa todos los campos requeridos', 'error');
-        return;
-      }
-      if (historia.length < 100) {
-        localToast('⚠ Tu historia debe tener al menos 100 caracteres', 'error');
-        return;
-      }
+      if (!titulo || !autor || !categoria || !historia) { window.showToast('Completa todos los campos requeridos.','error'); return; }
+      if (historia.length < 100) { window.showToast('La historia debe tener al menos 100 caracteres.','error'); return; }
+      if (!currentAuthUser)       { window.showToast('Debes iniciar sesión.','error'); return; }
 
       const btn    = document.getElementById('submitBtn');
       const status = document.getElementById('submitStatus');
-      btn.disabled  = true;
-      btn.textContent = '⏳ Enviando tu confesión...';
-      status.style.display = 'block';
-      status.textContent   = 'Guardando en las sombras...';
+      btn.disabled = true; btn.textContent = 'Publicando...';
+      status.style.display = 'block'; status.textContent = 'Procesando...';
 
       try {
-        // Comprimir imágenes en el navegador (canvas → base64)
-        const fotosBase64 = [];
+        // Build photos array
+        let fotosBase64 = [];
+
+        // Keep existing photos (for edit mode, minus removed ones)
+        if (editData && editData.fotos) {
+          fotosBase64 = editData.fotos.filter((_, i) => !removedExistingIndexes.includes(i));
+        }
+
+        // Compress new files
         if (selectedFiles.length > 0) {
           document.getElementById('uploadProgress').style.display = 'block';
           for (let i = 0; i < selectedFiles.length; i++) {
-            status.textContent = `Comprimiendo evidencia ${i+1} de ${selectedFiles.length}...`;
+            status.textContent = `Comprimiendo imagen ${i+1} de ${selectedFiles.length}...`;
             document.getElementById('uploadProgressFill').style.width = `${((i+1)/selectedFiles.length)*80}%`;
-            const b64 = await compressImage(selectedFiles[i]);
-            fotosBase64.push(b64);
+            fotosBase64.push(await compressImage(selectedFiles[i]));
           }
-          document.getElementById('uploadProgressFill').style.width = '90%';
         }
 
-        status.textContent = 'Registrando tu confesión...';
+        document.getElementById('uploadProgressFill').style.width = '90%';
+        status.textContent = 'Guardando en Firebase...';
 
-        await addDoc(collection(db, 'historias'), {
-          titulo,
-          autor,
-          categoria,
-          historia,
-          fotos: fotosBase64,      // base64 guardado directo en Firestore (gratis)
-          createdAt: serverTimestamp(),
-          views: 0,
-          likes: 0
-        });
+        const payload = {
+          titulo, autor, categoria, historia,
+          fotos: fotosBase64,
+          autorId:      currentAuthUser.uid,
+          autorNombre:  currentAuthUser.displayName || autor,
+          autorFoto:    currentAuthUser.photoURL || null,
+        };
+
+        if (editId && editData) {
+          await updateDoc(doc(db,'historias',editId), { ...payload, updatedAt: serverTimestamp() });
+          window.showToast('Historia actualizada.','success');
+          setTimeout(() => window.location.href = `/historia/${editId}`, 1500);
+        } else {
+          payload.createdAt = serverTimestamp();
+          payload.views = 0; payload.likes = 0;
+          const ref = await addDoc(collection(db,'historias'), payload);
+          window.showToast('Historia publicada.','success');
+          setTimeout(() => window.location.href = `/historia/${ref.id}`, 1500);
+        }
 
         document.getElementById('uploadProgressFill').style.width = '100%';
-        btn.textContent  = '✅ Confesión Registrada';
-        status.textContent = '¡Tu historia ha sido guardada en las sombras!';
-        localToast('✅ Historia publicada exitosamente', 'success');
-
-        setTimeout(() => { window.location.href = '/historias'; }, 2000);
-
-      } catch (err) {
+        btn.textContent = editId ? '✅ Guardado' : '✅ Publicado';
+      } catch(err) {
         console.error(err);
-        btn.disabled = false;
-        btn.textContent = '🩸 Confesar mi Terror';
+        btn.disabled = false; btn.textContent = editId ? 'Guardar Cambios' : 'Publicar Historia';
         status.style.display = 'none';
-        localToast('❌ Error al publicar: ' + err.message, 'error');
+        window.showToast('Error: ' + err.message, 'error');
       }
     });
-
-    function localToast(msg, type) {
-      if (window.showToast) { window.showToast(msg, type); return; }
-      const container = document.getElementById('toastContainer');
-      const t = document.createElement('div');
-      t.className = `toast ${type || ''}`;
-      t.textContent = msg;
-      container.appendChild(t);
-      setTimeout(() => t.classList.add('show'), 10);
-      setTimeout(() => { t.classList.remove('show'); setTimeout(() => t.remove(), 300); }, 4000);
-    }
   </script>
-
   <script src="/js/main.js"></script>
   <script src="/js/audio.js"></script>
 </body>

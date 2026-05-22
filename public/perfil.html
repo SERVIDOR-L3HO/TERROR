@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Perfil — Voces del Terror</title>
+  <link rel="stylesheet" href="/css/styles.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💀</text></svg>">
+</head>
+<body>
+  <div class="loading-overlay" id="loadingOverlay">
+    <div class="loading-logo">💀</div>
+    <div class="loading-bar"><div class="loading-bar-fill"></div></div>
+  </div>
+
+  <nav class="navbar">
+    <a href="/" class="nav-logo">💀 <span class="blood">VOCES</span> DEL TERROR</a>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="/">Inicio</a></li>
+      <li><a href="/historias">Historias</a></li>
+      <li><a href="/subir">Escribir</a></li>
+    </ul>
+    <div id="navLoginArea" style="display:flex;gap:8px;align-items:center;flex-shrink:0;">
+      <a href="/login" class="nav-btn outline">Entrar</a>
+      <a href="/login?tab=registro" class="nav-btn">Registro</a>
+    </div>
+    <div id="navUserArea" class="nav-user" style="display:none;flex-shrink:0;">
+      <div class="nav-avatar" onclick="window.__td&&window.__td()">
+        <img id="navAvatarImg" src="" alt="" style="display:none;width:100%;height:100%;object-fit:cover;">
+        <span id="navAvatarInit"></span>
+      </div>
+      <div class="nav-dropdown" id="navDropdown">
+        <div class="nav-dropdown-header">
+          <div class="nav-dropdown-name" id="navDropdownName"></div>
+          <div class="nav-dropdown-email" id="navDropdownEmail"></div>
+        </div>
+        <a href="/perfil">👤 Mi Perfil</a>
+        <a href="/subir">✍ Nueva Historia</a>
+        <div class="nav-dropdown-divider"></div>
+        <button onclick="window.__so&&window.__so()" class="danger">⬅ Cerrar Sesión</button>
+      </div>
+    </div>
+    <button class="hamburger" id="hamburger" aria-label="Menú"><span></span><span></span><span></span></button>
+  </nav>
+
+  <!-- PROFILE HEADER -->
+  <div class="profile-header" id="profileHeader">
+    <div class="profile-header-inner">
+      <div class="profile-info">
+        <div class="profile-avatar-lg" id="profileAvatar">?</div>
+        <div class="profile-details">
+          <h1 class="profile-name" id="profileName">Cargando...</h1>
+          <p class="profile-username" id="profileJoin"></p>
+          <p class="profile-bio" id="profileBio"></p>
+          <div class="profile-stats" id="profileStats"></div>
+        </div>
+        <div id="profileActions" style="margin-left:auto;display:flex;gap:8px;"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STORIES -->
+  <div class="section">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-label">— Confesiones —</span>
+        <h2 class="section-title" id="profileStoriesTitle">Historias publicadas</h2>
+      </div>
+      <div class="stories-grid" id="profileGrid">
+        <div class="empty-state" style="grid-column:1/-1">
+          <div class="empty-icon">⏳</div>
+          <p class="empty-sub">Cargando historias...</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="footer">
+    <div class="footer-inner">
+      <div class="footer-bottom"><p>© 2024 Voces del Terror</p><p><a href="/">Volver al inicio</a></p></div>
+    </div>
+  </footer>
+
+  <!-- EDIT BIO MODAL -->
+  <div class="modal-overlay" id="editBioModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 class="modal-title">Editar Perfil</h3>
+        <button class="modal-close" onclick="closeModal('editBioModal')">✕</button>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Nombre visible</label>
+        <input type="text" id="editName" class="form-input" maxlength="50" placeholder="Tu nombre">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Bio</label>
+        <textarea id="editBio" class="form-textarea" maxlength="300" placeholder="Cuéntanos algo sobre ti..." style="min-height:100px;"></textarea>
+        <div class="form-char"><span id="bioCharCount">0</span>/300</div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-ghost" onclick="closeModal('editBioModal')">Cancelar</button>
+        <button class="btn btn-primary" onclick="saveProfile()">Guardar cambios</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- DELETE CONFIRM MODAL -->
+  <div class="modal-overlay" id="deleteModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 class="modal-title">Eliminar Historia</h3>
+        <button class="modal-close" onclick="closeModal('deleteModal')">✕</button>
+      </div>
+      <p style="color:var(--text-2);font-size:0.9rem;margin-bottom:1rem;">¿Estás seguro de que quieres eliminar esta historia? Esta acción no se puede deshacer.</p>
+      <div class="modal-footer">
+        <button class="btn btn-ghost" onclick="closeModal('deleteModal')">Cancelar</button>
+        <button class="btn btn-danger" onclick="confirmDelete()">Sí, eliminar</button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { db } from '/js/firebase-config.js';
+    import { initAuth, doSignOut, toggleDropdown, initials, currentUser } from '/js/auth.js';
+    import {
+      doc, getDoc, getDocs, collection, query, where,
+      orderBy, updateDoc, deleteDoc, serverTimestamp
+    } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+    window.__so = doSignOut;
+    window.__td = toggleDropdown;
+
+    let viewUid    = null;
+    let ownProfile = false;
+    let userData   = {};
+    let pendingDeleteId = null;
+
+    initAuth(async user => {
+      const urlParams = new URLSearchParams(window.location.search);
+      viewUid = urlParams.get('uid') || (user ? user.uid : null);
+
+      if (!viewUid) { window.location.href = '/login'; return; }
+      ownProfile = user && user.uid === viewUid;
+      await loadProfile(viewUid);
+      await loadUserStories(viewUid);
+    });
+
+    async function loadProfile(uid) {
+      try {
+        const snap = await getDoc(doc(db, 'usuarios', uid));
+        if (!snap.exists()) { showError('Usuario no encontrado.'); return; }
+        userData = snap.data();
+        renderProfile(userData, uid);
+      } catch(e) { showError(e.message); }
+    }
+
+    function renderProfile(data, uid) {
+      const joinDate = data.createdAt
+        ? new Date(data.createdAt.seconds * 1000).toLocaleDateString('es-ES', {month:'long',year:'numeric'})
+        : '';
+
+      const avatarEl = document.getElementById('profileAvatar');
+      if (data.photoURL) {
+        avatarEl.innerHTML = `<img src="${data.photoURL}" alt="${data.displayName}" style="width:100%;height:100%;object-fit:cover;">`;
+      } else {
+        avatarEl.textContent = initials(data.displayName || 'U');
+      }
+
+      document.getElementById('profileName').textContent = data.displayName || 'Usuario';
+      document.getElementById('profileJoin').textContent  = joinDate ? `Miembro desde ${joinDate}` : '';
+      document.getElementById('profileBio').textContent   = data.bio || (ownProfile ? 'Sin bio — haz clic en Editar para agregar una.' : '');
+      document.title = `${data.displayName || 'Perfil'} — Voces del Terror`;
+
+      if (ownProfile) {
+        document.getElementById('profileActions').innerHTML = `
+          <button class="btn btn-ghost btn-sm" onclick="openEditModal()">✏ Editar perfil</button>
+          <a href="/subir" class="btn btn-primary btn-sm">+ Nueva historia</a>`;
+      }
+    }
+
+    async function loadUserStories(uid) {
+      try {
+        const q = query(collection(db, 'historias'), where('autorId','==',uid), orderBy('createdAt','desc'));
+        const snap = await getDocs(q);
+        const stories = [];
+        snap.forEach(d => stories.push({ id: d.id, ...d.data() }));
+
+        document.getElementById('profileStoriesTitle').textContent = `${stories.length} Confesión${stories.length!==1?'es':''}`;
+        document.getElementById('profileStats').innerHTML = `
+          <span><span class="profile-stat-num">${stories.length}</span><span class="profile-stat-lbl">historias</span></span>
+        `;
+
+        const grid = document.getElementById('profileGrid');
+        if (stories.length === 0) {
+          grid.innerHTML = `<div class="empty-state" style="grid-column:1/-1">
+            <div class="empty-icon">📖</div>
+            <h3 class="empty-title">Sin historias aún</h3>
+            ${ownProfile ? '<a href="/subir" class="btn btn-primary" style="margin-top:1rem;">Escribir primera historia</a>' : ''}
+          </div>`;
+          return;
+        }
+
+        grid.innerHTML = stories.map(h => buildCard(h)).join('');
+      } catch(e) {
+        document.getElementById('profileGrid').innerHTML = `<div class="empty-state" style="grid-column:1/-1"><p class="empty-sub">Error: ${e.message}</p></div>`;
+      }
+    }
+
+    function buildCard(h) {
+      const imgHtml = h.fotos && h.fotos.length
+        ? `<div class="card-img"><img src="${h.fotos[0]}" alt="${h.titulo}" loading="lazy"><span class="card-category-badge">${h.categoria||'Otro'}</span></div>`
+        : `<div class="card-img"><div class="card-img-placeholder">💀</div><span class="card-category-badge">${h.categoria||'Otro'}</span></div>`;
+      const date = h.createdAt ? new Date(h.createdAt.seconds*1000).toLocaleDateString('es-ES',{day:'numeric',month:'short',year:'numeric'}) : '';
+      const ownerActions = ownProfile ? `
+        <div style="display:flex;gap:6px;margin-top:10px;padding-top:10px;border-top:1px solid var(--border);">
+          <a href="/subir?editar=${h.id}" class="btn btn-ghost btn-sm" style="flex:1;justify-content:center;">✏ Editar</a>
+          <button class="btn btn-danger btn-sm" style="flex:1;" onclick="event.preventDefault();openDelete('${h.id}')">🗑 Eliminar</button>
+        </div>` : '';
+      return `
+        <a href="/historia/${h.id}" class="story-card" style="text-decoration:none;">
+          ${imgHtml}
+          <div class="card-body">
+            <h3 class="card-title">${h.titulo}</h3>
+            <p class="card-excerpt">${(h.historia||'').substring(0,140)}...</p>
+            <div class="card-footer">
+              <span class="card-dot">${date}</span>
+              <span class="card-meta-right">
+                <span class="card-stat">👁 ${h.views||0}</span>
+                <span class="card-stat">🩸 ${h.likes||0}</span>
+              </span>
+            </div>
+            ${ownerActions}
+          </div>
+        </a>`;
+    }
+
+    // Edit profile modal
+    window.openEditModal = function() {
+      document.getElementById('editName').value = userData.displayName || '';
+      document.getElementById('editBio').value  = userData.bio || '';
+      document.getElementById('bioCharCount').textContent = (userData.bio||'').length;
+      document.getElementById('editBioModal').classList.add('open');
+    };
+
+    document.getElementById('editBio').addEventListener('input', function() {
+      document.getElementById('bioCharCount').textContent = this.value.length;
+    });
+
+    window.saveProfile = async function() {
+      const name = document.getElementById('editName').value.trim();
+      const bio  = document.getElementById('editBio').value.trim();
+      if (!name) { window.showToast('El nombre no puede estar vacío.','error'); return; }
+      try {
+        const user = (await import('/js/auth.js')).currentUser;
+        await updateDoc(doc(db,'usuarios',user.uid), { displayName: name, bio });
+        userData.displayName = name; userData.bio = bio;
+        renderProfile(userData, user.uid);
+        closeModal('editBioModal');
+        window.showToast('Perfil actualizado.','success');
+      } catch(e) { window.showToast('Error: '+e.message,'error'); }
+    };
+
+    // Delete story
+    window.openDelete = function(id) {
+      pendingDeleteId = id;
+      document.getElementById('deleteModal').classList.add('open');
+    };
+
+    window.confirmDelete = async function() {
+      if (!pendingDeleteId) return;
+      try {
+        await deleteDoc(doc(db,'historias',pendingDeleteId));
+        closeModal('deleteModal');
+        window.showToast('Historia eliminada.','info');
+        document.querySelector(`[onclick*="${pendingDeleteId}"]`)?.closest('.story-card')?.remove();
+        pendingDeleteId = null;
+      } catch(e) { window.showToast('Error: '+e.message,'error'); }
+    };
+
+    window.closeModal = function(id) {
+      document.getElementById(id).classList.remove('open');
+    };
+
+    function showError(msg) {
+      document.getElementById('profileHeader').innerHTML = `<div class="profile-header-inner"><p style="color:var(--text-3);">⚠ ${msg}</p></div>`;
+    }
+  </script>
+  <script src="/js/main.js"></script>
+</body>
+</html>

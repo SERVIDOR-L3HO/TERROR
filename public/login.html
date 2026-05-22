@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Acceder — Voces del Terror</title>
+  <link rel="stylesheet" href="/css/styles.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💀</text></svg>">
+</head>
+<body>
+  <div class="loading-overlay" id="loadingOverlay">
+    <div class="loading-logo">💀</div>
+    <div class="loading-bar"><div class="loading-bar-fill"></div></div>
+  </div>
+
+  <nav class="navbar">
+    <a href="/" class="nav-logo">💀 <span class="blood">VOCES</span> DEL TERROR</a>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="/">Inicio</a></li>
+      <li><a href="/historias">Historias</a></li>
+    </ul>
+    <button class="hamburger" id="hamburger" aria-label="Menú"><span></span><span></span><span></span></button>
+  </nav>
+
+  <div class="auth-page">
+    <div class="auth-box">
+      <div class="auth-logo"><span>💀 VOCES DEL TERROR</span></div>
+
+      <!-- TABS -->
+      <div style="display:flex;gap:0;border:1px solid var(--border);border-radius:6px;overflow:hidden;margin-bottom:2rem;">
+        <button class="tab-btn active" id="tabEntrar" onclick="switchTab('entrar')"
+          style="flex:1;padding:10px;background:var(--bg-3);border:none;color:var(--text);font-size:0.875rem;font-weight:500;cursor:pointer;transition:all 0.2s;">
+          Entrar
+        </button>
+        <button class="tab-btn" id="tabRegistro" onclick="switchTab('registro')"
+          style="flex:1;padding:10px;background:transparent;border:none;color:var(--text-3);font-size:0.875rem;font-weight:500;cursor:pointer;transition:all 0.2s;">
+          Registro
+        </button>
+      </div>
+
+      <!-- ERROR ALERT -->
+      <div id="authError" class="alert alert-danger" style="display:none;"></div>
+      <div id="authSuccess" class="alert alert-info" style="display:none;"></div>
+
+      <!-- GOOGLE -->
+      <button class="btn-google" id="googleBtn" onclick="loginGoogle()">
+        <svg width="18" height="18" viewBox="0 0 18 18"><path fill="#4285F4" d="M16.51 8H8.98v3h4.3c-.18 1-.74 1.48-1.6 2.04v2.01h2.6a7.8 7.8 0 0 0 2.38-5.88c0-.57-.05-.66-.15-1.18z"/><path fill="#34A853" d="M8.98 17c2.16 0 3.97-.72 5.3-1.94l-2.6-2a4.8 4.8 0 0 1-7.18-2.54H1.83v2.07A8 8 0 0 0 8.98 17z"/><path fill="#FBBC05" d="M4.5 10.52a4.8 4.8 0 0 1 0-3.04V5.41H1.83a8 8 0 0 0 0 7.18l2.67-2.07z"/><path fill="#EA4335" d="M8.98 4.18c1.17 0 2.23.4 3.06 1.2l2.3-2.3A8 8 0 0 0 1.83 5.4L4.5 7.49a4.77 4.77 0 0 1 4.48-3.31z"/></svg>
+        Continuar con Google
+      </button>
+
+      <div class="auth-divider">o</div>
+
+      <!-- ENTRAR FORM -->
+      <form id="formEntrar" onsubmit="loginEmail(event)">
+        <div class="form-group">
+          <label class="form-label">Correo electrónico</label>
+          <div class="input-wrapper">
+            <span class="input-icon">✉</span>
+            <input type="email" id="loginEmail" class="form-input" placeholder="tu@correo.com" required autocomplete="email">
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Contraseña</label>
+          <div class="input-wrapper" style="position:relative">
+            <span class="input-icon">🔒</span>
+            <input type="password" id="loginPass" class="form-input" placeholder="••••••••" required autocomplete="current-password" minlength="6">
+            <button type="button" class="input-eye" onclick="togglePass('loginPass',this)">👁</button>
+          </div>
+        </div>
+        <button type="submit" class="btn btn-primary btn-lg" style="width:100%" id="loginBtn">Entrar</button>
+      </form>
+
+      <!-- REGISTRO FORM -->
+      <form id="formRegistro" style="display:none" onsubmit="registerEmail(event)">
+        <div class="form-group">
+          <label class="form-label">Tu nombre <span class="req">*</span></label>
+          <div class="input-wrapper">
+            <span class="input-icon">👤</span>
+            <input type="text" id="regName" class="form-input" placeholder="¿Cómo te llamamos?" required autocomplete="name" minlength="2" maxlength="50">
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Correo electrónico <span class="req">*</span></label>
+          <div class="input-wrapper">
+            <span class="input-icon">✉</span>
+            <input type="email" id="regEmail" class="form-input" placeholder="tu@correo.com" required autocomplete="email">
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Contraseña <span class="req">*</span></label>
+          <div class="input-wrapper" style="position:relative">
+            <span class="input-icon">🔒</span>
+            <input type="password" id="regPass" class="form-input" placeholder="Mínimo 6 caracteres" required autocomplete="new-password" minlength="6">
+            <button type="button" class="input-eye" onclick="togglePass('regPass',this)">👁</button>
+          </div>
+          <div class="form-hint">Mínimo 6 caracteres</div>
+        </div>
+        <div class="form-group">
+          <label class="form-checkbox">
+            <input type="checkbox" required>
+            <span>Acepto que mis historias sean publicadas y que el contenido es responsabilidad mía.</span>
+          </label>
+        </div>
+        <button type="submit" class="btn btn-primary btn-lg" style="width:100%" id="regBtn">Crear cuenta</button>
+      </form>
+
+      <div class="auth-switch" id="switchText">
+        ¿No tienes cuenta? <a href="#" onclick="switchTab('registro');return false;">Regístrate gratis</a>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { initAuth, signInWithGoogle, signInEmail, signUpEmail, doSignOut } from '/js/auth.js';
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const tab       = urlParams.get('tab');
+    const from      = urlParams.get('from') || '/';
+
+    if (tab === 'registro') switchTab('registro');
+
+    // If already logged in, redirect
+    initAuth(user => { if (user) window.location.href = from; });
+
+    window.switchTab = function(t) {
+      const isEntrar = t === 'entrar';
+      document.getElementById('formEntrar').style.display  = isEntrar ? '' : 'none';
+      document.getElementById('formRegistro').style.display = isEntrar ? 'none' : '';
+      document.getElementById('tabEntrar').style.background  = isEntrar ? 'var(--bg-3)' : 'transparent';
+      document.getElementById('tabEntrar').style.color       = isEntrar ? 'var(--text)'  : 'var(--text-3)';
+      document.getElementById('tabRegistro').style.background = isEntrar ? 'transparent' : 'var(--bg-3)';
+      document.getElementById('tabRegistro').style.color      = isEntrar ? 'var(--text-3)' : 'var(--text)';
+      document.getElementById('switchText').innerHTML = isEntrar
+        ? '¿No tienes cuenta? <a href="#" onclick="switchTab(\'registro\');return false;">Regístrate gratis</a>'
+        : '¿Ya tienes cuenta? <a href="#" onclick="switchTab(\'entrar\');return false;">Inicia sesión</a>';
+      clearError();
+    };
+
+    window.loginGoogle = async function() {
+      clearError();
+      document.getElementById('googleBtn').disabled = true;
+      document.getElementById('googleBtn').textContent = 'Conectando...';
+      const r = await signInWithGoogle();
+      if (!r.ok) {
+        showError(r.error);
+        document.getElementById('googleBtn').disabled = false;
+        document.getElementById('googleBtn').innerHTML = `<svg width="18" height="18" viewBox="0 0 18 18">...</svg> Continuar con Google`;
+      }
+    };
+
+    window.loginEmail = async function(e) {
+      e.preventDefault(); clearError();
+      const btn = document.getElementById('loginBtn');
+      btn.disabled = true; btn.textContent = 'Entrando...';
+      const r = await signInEmail(
+        document.getElementById('loginEmail').value,
+        document.getElementById('loginPass').value
+      );
+      if (!r.ok) { showError(r.error); btn.disabled = false; btn.textContent = 'Entrar'; }
+    };
+
+    window.registerEmail = async function(e) {
+      e.preventDefault(); clearError();
+      const btn = document.getElementById('regBtn');
+      btn.disabled = true; btn.textContent = 'Creando cuenta...';
+      const r = await signUpEmail(
+        document.getElementById('regName').value.trim(),
+        document.getElementById('regEmail').value,
+        document.getElementById('regPass').value
+      );
+      if (!r.ok) { showError(r.error); btn.disabled = false; btn.textContent = 'Crear cuenta'; }
+    };
+
+    window.togglePass = function(id, btn) {
+      const input = document.getElementById(id);
+      input.type = input.type === 'password' ? 'text' : 'password';
+      btn.textContent = input.type === 'password' ? '👁' : '🙈';
+    };
+
+    function showError(msg) {
+      const el = document.getElementById('authError');
+      el.textContent = '⚠ ' + msg; el.style.display = 'flex';
+    }
+    function clearError() {
+      document.getElementById('authError').style.display = 'none';
+      document.getElementById('authSuccess').style.display = 'none';
+    }
+  </script>
+  <script src="/js/main.js"></script>
+</body>
+</html>

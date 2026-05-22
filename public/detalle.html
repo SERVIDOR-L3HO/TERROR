@@ -3,356 +3,354 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Historia — VOCES DEL TERROR</title>
+  <title>Historia — Voces del Terror</title>
   <link rel="stylesheet" href="/css/styles.css">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💀</text></svg>">
-  <style>
-    .share-btn {
-      background: transparent;
-      border: 1px solid #2a1a1a;
-      color: var(--text-muted);
-      padding: 8px 20px;
-      font-family: 'Special Elite', cursive;
-      font-size: 0.75rem;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      cursor: pointer;
-      transition: all 0.3s;
-    }
-    .share-btn:hover {
-      border-color: var(--blood-red);
-      color: var(--crimson);
-    }
-    .like-btn {
-      background: transparent;
-      border: 1px solid #2a1a1a;
-      color: var(--text-muted);
-      padding: 10px 24px;
-      font-family: 'Special Elite', cursive;
-      font-size: 0.8rem;
-      letter-spacing: 2px;
-      cursor: pointer;
-      transition: all 0.3s;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    .like-btn:hover, .like-btn.liked {
-      border-color: var(--blood-red);
-      color: var(--crimson);
-      background: rgba(139,0,0,0.1);
-      box-shadow: var(--glow-red);
-    }
-    .back-link {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      color: var(--text-muted);
-      text-decoration: none;
-      font-family: 'Special Elite', cursive;
-      font-size: 0.8rem;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      transition: color 0.3s;
-      margin-bottom: 2rem;
-    }
-    .back-link:hover { color: var(--crimson); }
-    .related-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-      gap: 1.5rem;
-    }
-  </style>
 </head>
 <body>
-
   <div class="loading-overlay" id="loadingOverlay">
     <div class="loading-logo">💀</div>
     <div class="loading-bar"><div class="loading-bar-fill"></div></div>
   </div>
-
-  <!-- Reading progress bar -->
   <div class="reading-progress" id="readingProgress"></div>
-
-  <div class="particles-container" id="particles"></div>
 
   <!-- LIGHTBOX -->
   <div class="lightbox" id="lightbox" onclick="closeLightbox()">
-    <span class="lightbox-close">✕</span>
+    <button class="lightbox-close" onclick="closeLightbox()">✕</button>
     <img src="" alt="" id="lightboxImg">
   </div>
 
-  <nav class="navbar">
-    <a href="/" class="nav-logo">💀 <span>VOCES</span> DEL TERROR</a>
-    <ul class="nav-links" id="navLinks">
-      <li><a href="/">Inicio</a></li>
-      <li><a href="/historias">Historias</a></li>
-      <li><a href="/subir" class="btn-nav">+ Confesar</a></li>
-    </ul>
-    <button class="hamburger" id="hamburger"><span></span><span></span><span></span></button>
-  </nav>
-
-  <div style="padding-top:70px;">
-    <div class="story-detail" id="storyContent">
-      <div class="empty-state" style="padding:8rem 2rem;">
-        <span class="empty-state-icon">⏳</span>
-        <h3>Cargando confesión...</h3>
+  <!-- DELETE MODAL -->
+  <div class="modal-overlay" id="deleteModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 class="modal-title">Eliminar Historia</h3>
+        <button class="modal-close" onclick="closeModal('deleteModal')">✕</button>
+      </div>
+      <p style="color:var(--text-2);font-size:0.9rem;">¿Estás seguro? Esta acción no se puede deshacer. La historia y todas sus evidencias serán eliminadas permanentemente.</p>
+      <div class="modal-footer">
+        <button class="btn btn-ghost" onclick="closeModal('deleteModal')">Cancelar</button>
+        <button class="btn btn-danger" onclick="confirmDelete()">Sí, eliminar</button>
       </div>
     </div>
   </div>
 
-  <!-- RELATED STORIES -->
-  <div style="background:#080000;border-top:1px solid var(--card-border);padding:5rem 2rem;">
-    <div style="max-width:900px;margin:0 auto;">
-      <div class="section-header">
-        <span class="section-eyebrow">— Sigue Leyendo —</span>
-        <h2 class="section-title">Más Confesiones</h2>
-        <div class="section-divider"></div>
+  <nav class="navbar">
+    <a href="/" class="nav-logo">💀 <span class="blood">VOCES</span> DEL TERROR</a>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="/">Inicio</a></li>
+      <li><a href="/historias">Historias</a></li>
+      <li><a href="/subir">Escribir</a></li>
+    </ul>
+    <div id="navLoginArea" style="display:flex;gap:8px;align-items:center;flex-shrink:0;">
+      <a href="/login" class="nav-btn outline">Entrar</a>
+      <a href="/login?tab=registro" class="nav-btn">Registro</a>
+    </div>
+    <div id="navUserArea" class="nav-user" style="display:none;flex-shrink:0;">
+      <div class="nav-avatar" onclick="window.__td&&window.__td()">
+        <img id="navAvatarImg" src="" alt="" style="display:none;width:100%;height:100%;object-fit:cover;">
+        <span id="navAvatarInit"></span>
       </div>
-      <div class="related-grid" id="relatedGrid"></div>
+      <div class="nav-dropdown" id="navDropdown">
+        <div class="nav-dropdown-header">
+          <div class="nav-dropdown-name" id="navDropdownName"></div>
+          <div class="nav-dropdown-email" id="navDropdownEmail"></div>
+        </div>
+        <a href="/perfil">👤 Mi Perfil</a>
+        <a href="/subir">✍ Nueva Historia</a>
+        <div class="nav-dropdown-divider"></div>
+        <button onclick="window.__so&&window.__so()" class="danger">⬅ Cerrar Sesión</button>
+      </div>
+    </div>
+    <button class="hamburger" id="hamburger" aria-label="Menú"><span></span><span></span><span></span></button>
+  </nav>
+
+  <div id="storyContent">
+    <div class="empty-state" style="padding:10rem 2rem;">
+      <div class="empty-icon">⏳</div>
+      <p class="empty-sub">Cargando historia...</p>
+    </div>
+  </div>
+
+  <!-- RELATED -->
+  <div style="background:var(--bg-2);border-top:1px solid var(--border);" id="relatedSection" style="display:none;">
+    <div class="section">
+      <div class="container">
+        <div class="section-header">
+          <span class="section-label">— Sigue Leyendo —</span>
+          <h2 class="section-title">Más Confesiones</h2>
+        </div>
+        <div class="stories-grid" id="relatedGrid"></div>
+      </div>
     </div>
   </div>
 
   <footer class="footer">
-    <div class="footer-logo">💀</div>
-    <p class="footer-tagline">Voces del Terror</p>
-    <div class="footer-links">
-      <a href="/">Inicio</a>
-      <a href="/historias">Historias</a>
-      <a href="/subir">Subir Historia</a>
-    </div>
-    <div class="footer-bottom">
-      <p>⚠ Contenido perturbador para adultos.</p>
+    <div class="footer-inner">
+      <div class="footer-grid">
+        <div class="footer-brand"><div class="footer-logo">💀 VOCES DEL TERROR</div></div>
+        <div class="footer-col"><h4>Navegar</h4><ul><li><a href="/">Inicio</a></li><li><a href="/historias">Historias</a></li><li><a href="/subir">Escribir</a></li></ul></div>
+      </div>
+      <div class="footer-bottom"><p>© 2024 Voces del Terror. ⚠ Solo para adultos.</p></div>
     </div>
   </footer>
 
-  <div class="toast-container" id="toastContainer"></div>
-
   <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getFirestore, doc, getDoc, collection, getDocs, query, orderBy, limit, updateDoc, increment } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { db } from '/js/firebase-config.js';
+    import { initAuth, doSignOut, toggleDropdown, initials } from '/js/auth.js';
+    import { initComments } from '/js/comments.js';
+    import {
+      doc, getDoc, collection, getDocs, query, orderBy,
+      limit, updateDoc, deleteDoc, increment
+    } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-    const firebaseConfig = {
-      apiKey: "AIzaSyBKCSSMZE3ybpyP1MSegm4nu1GUGQt9oNc",
-      authDomain: "terror-6f51e.firebaseapp.com",
-      projectId: "terror-6f51e",
-      storageBucket: "terror-6f51e.firebasestorage.app",
-      messagingSenderId: "127086938530",
-      appId: "1:127086938530:web:bcd051bcf8766e9b214afb",
-      measurementId: "G-K3J8MKZQ94"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
-    window.__db = db;
+    window.__so = doSignOut;
+    window.__td = toggleDropdown;
 
     const storyId = window.location.pathname.split('/historia/')[1];
+    let currentAuthUser = null;
+    let storyData       = null;
 
-    async function loadStory() {
+    initAuth(async user => {
+      currentAuthUser = user;
+      await loadStory(user);
+    });
+
+    async function loadStory(user) {
       try {
-        const docRef = doc(db, 'historias', storyId);
-        const docSnap = await getDoc(docRef);
-
-        if (!docSnap.exists()) {
-          document.getElementById('storyContent').innerHTML = `
-            <div class="empty-state" style="padding:8rem 2rem;">
-              <span class="empty-state-icon">💀</span>
-              <h3>Historia no encontrada</h3>
-              <p style="margin-top:1rem;"><a href="/historias" class="btn-primary">Ver todas las historias</a></p>
-            </div>`;
-          return;
+        const snap = await getDoc(doc(db,'historias',storyId));
+        if (!snap.exists()) {
+          document.getElementById('storyContent').innerHTML = `<div class="empty-state" style="padding:10rem 2rem;">
+            <div class="empty-icon">💀</div>
+            <h3 class="empty-title">Historia no encontrada</h3>
+            <p class="empty-sub">Puede que haya sido eliminada.</p>
+            <a href="/historias" class="btn btn-primary" style="margin-top:1rem;">Ver todas las historias</a>
+          </div>`; return;
         }
+        storyData = { id: snap.id, ...snap.data() };
+        document.title = `${storyData.titulo} — Voces del Terror`;
 
-        const data = { id: docSnap.id, ...docSnap.data() };
-        document.title = `${data.titulo} — VOCES DEL TERROR`;
+        // Increment views (silent)
+        updateDoc(doc(db,'historias',storyId), { views: increment(1) }).catch(()=>{});
 
-        // Increment views
-        try { await updateDoc(docRef, { views: increment(1) }); } catch(e) {}
+        renderStory(storyData, user);
+        loadRelated(storyData.categoria, storyId);
 
-        const dateStr = data.createdAt
-          ? new Date(data.createdAt.seconds * 1000).toLocaleDateString('es-ES', {weekday:'long',year:'numeric',month:'long',day:'numeric'})
-          : 'Fecha desconocida';
+        // Init comments after story renders
+        setTimeout(() => initComments(storyId), 100);
 
-        // Format story into paragraphs
-        const paragraphs = (data.historia || '').split('\n').filter(p => p.trim()).map(p => `<p>${p}</p>`).join('');
+      } catch(e) {
+        document.getElementById('storyContent').innerHTML = `<div class="empty-state" style="padding:10rem 2rem;">
+          <div class="empty-icon">⚠️</div>
+          <h3 class="empty-title">Error al cargar</h3>
+          <p class="empty-sub">${e.message}</p>
+        </div>`;
+      }
+    }
 
-        // Evidence gallery
-        const galleryHtml = data.fotos && data.fotos.length ? `
-          <div style="margin:3rem 0;">
-            <h3 style="font-family:'Creepster',cursive;font-size:1.8rem;color:var(--crimson);text-shadow:var(--glow-red);margin-bottom:1.5rem;">📸 Evidencias (${data.fotos.length})</h3>
-            <div class="evidence-gallery">
-              ${data.fotos.map((url, i) => `
-                <div class="evidence-item" onclick="openLightbox('${url}')">
-                  <img src="${url}" alt="Evidencia ${i+1}" loading="lazy">
-                </div>`).join('')}
-            </div>
-          </div>` : '';
+    function renderStory(data, user) {
+      const isOwner = user && user.uid === data.autorId;
+      const dateStr = data.createdAt
+        ? new Date(data.createdAt.seconds*1000).toLocaleDateString('es-ES',{weekday:'long',year:'numeric',month:'long',day:'numeric'})
+        : '';
+      const updatedStr = data.updatedAt
+        ? `· Editado ${new Date(data.updatedAt.seconds*1000).toLocaleDateString('es-ES',{day:'numeric',month:'short'})}` : '';
 
-        document.getElementById('storyContent').innerHTML = `
-          <a href="/historias" class="back-link">← Volver a las Historias</a>
+      const autorNombre = data.autor || data.autorNombre || 'Anónimo';
+      const autorAvatarHtml = data.autorFoto
+        ? `<img src="${data.autorFoto}" alt="${autorNombre}">`
+        : `<span>${initials(autorNombre)}</span>`;
 
-          <div class="story-header">
-            <div style="font-family:'Special Elite',cursive;font-size:0.75rem;letter-spacing:3px;color:var(--blood-red);text-transform:uppercase;margin-bottom:1rem;">${data.categoria || 'Paranormal'}</div>
-            <h1 class="story-title-detail">${data.titulo}</h1>
-            <div class="story-meta-detail">
-              <span>✍ ${data.autor || 'Anónimo'}</span>
-              <span>📅 ${dateStr}</span>
-              ${data.views ? `<span>👁 ${data.views} lecturas</span>` : ''}
-              ${data.fotos && data.fotos.length ? `<span>📸 ${data.fotos.length} evidencias</span>` : ''}
+      // Cover image
+      const coverHtml = data.fotos && data.fotos.length
+        ? `<div class="story-cover"><img src="${data.fotos[0]}" alt="${data.titulo}" loading="lazy"><div class="story-cover-gradient"></div></div>` : '';
+
+      // Paragraphs
+      const bodyHtml = (data.historia||'').split('\n')
+        .filter(p => p.trim())
+        .map(p => `<p>${p.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}</p>`)
+        .join('');
+
+      // Evidence gallery (skip first photo if used as cover)
+      const galleryPhotos = data.fotos && data.fotos.length > 1 ? data.fotos.slice(1) : (data.fotos && data.fotos.length === 1 && !data.fotos.length ? data.fotos : []);
+      const allPhotos     = data.fotos || [];
+      const galleryHtml = allPhotos.length > 1 ? `
+        <div class="evidence-section">
+          <div class="evidence-section-title">📸 Evidencias (${allPhotos.length})</div>
+          <div class="evidence-grid">
+            ${allPhotos.map((url,i) => `
+              <div class="evidence-item" onclick="openLightbox('${url}')">
+                <img src="${url}" alt="Evidencia ${i+1}" loading="lazy">
+              </div>`).join('')}
+          </div>
+        </div>` : '';
+
+      // Owner actions
+      const ownerHtml = isOwner ? `
+        <a href="/subir?editar=${data.id}" class="action-btn">✏ Editar historia</a>
+        <button class="action-btn" style="color:#ef4444;border-color:rgba(239,68,68,0.2);" onclick="openDeleteModal()">🗑 Eliminar</button>
+      ` : '';
+
+      const liked = localStorage.getItem(`liked_${storyId}`);
+
+      document.getElementById('storyContent').innerHTML = `
+        <!-- HEADER -->
+        <div class="story-detail-header">
+          <div class="container-narrow">
+            <a href="/historias" style="display:inline-flex;align-items:center;gap:6px;color:var(--text-3);font-size:0.82rem;margin-bottom:1.5rem;transition:color 0.2s;" onmouseover="this.style.color='var(--text-2)'" onmouseout="this.style.color='var(--text-3)'">← Todas las historias</a>
+            <span class="category-label">${data.categoria || 'Paranormal'}</span>
+            <h1 class="story-detail-title">${data.titulo}</h1>
+            <div class="story-detail-meta">
+              <div class="story-detail-author">
+                <div class="story-author-avatar">${autorAvatarHtml}</div>
+                <a href="/perfil?uid=${data.autorId||''}" style="color:inherit;">${autorNombre}</a>
+              </div>
+              <span>${dateStr}</span>
+              ${updatedStr ? `<span>${updatedStr}</span>` : ''}
+              <span>👁 ${data.views||0} lecturas</span>
+              ${data.fotos&&data.fotos.length?`<span>📸 ${data.fotos.length} evidencias</span>`:''}
             </div>
           </div>
+        </div>
+
+        ${coverHtml}
+
+        <div class="story-body-wrap">
 
           <!-- AUDIO PLAYER -->
-          <div class="audio-section" id="mainAudioSection">
-            <div class="audio-section-title">🎙 Narrador Oscuro — Escucha esta Confesión</div>
-            <div class="audio-controls">
-              <button type="button" class="audio-play-btn" id="mainPlayBtn" onclick="toggleMainAudio()">▶</button>
-              <div class="audio-waveform" id="mainWaveform"></div>
-              <div class="audio-info">
-                <div class="audio-status" id="mainAudioStatus">LISTO PARA NARRAR</div>
-                <div class="audio-duration" id="mainAudioDuration"></div>
+          <div class="audio-player">
+            <div class="audio-player-header">
+              <div class="audio-icon">🎙</div>
+              <div>
+                <div class="audio-player-title">Narrador — Escucha esta Historia</div>
+                <div class="audio-player-sub">Síntesis de voz del navegador</div>
               </div>
             </div>
-            <select class="voice-select" id="mainVoiceSelect">
-              <option value="">Voz automática</option>
-            </select>
+            <div class="audio-controls-row">
+              <button type="button" class="audio-play-btn" id="mainPlayBtn" onclick="toggleMainAudio()">▶</button>
+              <div class="audio-waveform" id="mainWaveform"></div>
+              <span class="audio-status-text" id="mainAudioStatus">Listo</span>
+            </div>
+            <select class="voice-picker" id="mainVoiceSelect"></select>
           </div>
 
           <!-- STORY BODY -->
-          <div class="story-body" id="storyBody">
-            ${paragraphs}
-          </div>
+          <div class="story-body">${bodyHtml}</div>
 
           ${galleryHtml}
 
-          <!-- ACTIONS -->
-          <div style="display:flex;gap:1rem;flex-wrap:wrap;align-items:center;border-top:1px solid var(--card-border);padding-top:2rem;margin-top:2rem;">
-            <button class="like-btn" id="likeBtn" onclick="toggleLike('${data.id}')">
-              🩸 <span id="likeCount">${data.likes || 0}</span> Les perturbó
+          <!-- ACTIONS BAR -->
+          <div class="story-actions">
+            <button class="action-btn ${liked ? 'liked' : ''}" id="likeBtn" onclick="toggleLike()">
+              🩸 <span id="likeCount">${data.likes||0}</span> Les perturbó
             </button>
-            <button class="share-btn" onclick="shareStory('${data.titulo}')">📢 Compartir</button>
-            <a href="/historias" class="share-btn">← Más Historias</a>
-            <a href="/subir" class="btn-primary" style="margin-left:auto;">🩸 Contar la Tuya</a>
+            <button class="action-btn" onclick="shareStory()">📢 Compartir</button>
+            <a href="/historias" class="action-btn">← Más historias</a>
+            ${ownerHtml}
+            <a href="/subir" class="btn btn-primary btn-sm" style="margin-left:auto;">+ Escribir la mía</a>
           </div>
-        `;
 
-        // Build waveform bars
-        buildWaveform('mainWaveform', 50);
+          <!-- COMMENTS -->
+          <div class="comments-section">
+            <div class="comments-title">
+              Comentarios <span class="comments-count" id="commentsCount"></span>
+            </div>
+            <div id="commentFormArea"></div>
+            <div id="commentsList"></div>
+          </div>
+        </div>`;
 
-        // Load related stories
-        loadRelated(data.categoria, data.id);
-
-        // Store story data for audio
-        window.__currentStory = data;
-
-        // Init voices for this page
-        setTimeout(() => {
-          if (window.populateVoices) window.populateVoices('mainVoiceSelect');
-        }, 500);
-
-      } catch(e) {
-        console.error(e);
-        document.getElementById('storyContent').innerHTML = `
-          <div class="empty-state" style="padding:8rem 2rem;">
-            <span class="empty-state-icon">⚠️</span>
-            <h3>Error al cargar la historia</h3>
-            <p style="color:var(--text-muted);margin-top:0.5rem;">Configura las reglas de Firestore para permitir lectura.</p>
-          </div>`;
-      }
+      // Build waveform
+      setTimeout(() => {
+        if (window.buildWaveform) window.buildWaveform('mainWaveform', 50);
+        if (window.populateVoices) window.populateVoices('mainVoiceSelect');
+      }, 300);
     }
 
     async function loadRelated(categoria, currentId) {
       try {
-        const q = query(collection(db, 'historias'), orderBy('createdAt', 'desc'), limit(10));
+        const q    = query(collection(db,'historias'), orderBy('createdAt','desc'), limit(10));
         const snap = await getDocs(q);
-        const stories = [];
-        snap.forEach(d => { if (d.id !== currentId) stories.push({ id: d.id, ...d.data() }); });
-        const related = stories.slice(0, 3);
+        const list = [];
+        snap.forEach(d => { if (d.id !== currentId) list.push({ id: d.id, ...d.data() }); });
+        const related = list.slice(0, 3);
+        if (!related.length) return;
 
+        document.getElementById('relatedSection').style.display = '';
         document.getElementById('relatedGrid').innerHTML = related.map(h => {
           const imgHtml = h.fotos && h.fotos.length
-            ? `<img src="${h.fotos[0]}" alt="${h.titulo}" class="card-image" loading="lazy">`
-            : `<div class="card-no-image">💀</div>`;
-          return `
-            <a href="/historia/${h.id}" class="story-card">
-              ${imgHtml}
-              <div class="card-content">
-                <div class="card-category">${h.categoria || 'Paranormal'}</div>
-                <h3 class="card-title">${h.titulo}</h3>
-                <p class="card-excerpt">${(h.historia || '').substring(0, 100)}...</p>
-              </div>
-            </a>`;
+            ? `<div class="card-img"><img src="${h.fotos[0]}" alt="${h.titulo}" loading="lazy"><span class="card-category-badge">${h.categoria||'Otro'}</span></div>`
+            : `<div class="card-img"><div class="card-img-placeholder">💀</div><span class="card-category-badge">${h.categoria||'Otro'}</span></div>`;
+          return `<a href="/historia/${h.id}" class="story-card">
+            ${imgHtml}
+            <div class="card-body">
+              <h3 class="card-title">${h.titulo}</h3>
+              <p class="card-excerpt">${(h.historia||'').substring(0,100)}...</p>
+            </div>
+          </a>`;
         }).join('');
       } catch(e) {}
     }
 
-    window.toggleLike = async function(id) {
-      const btn = document.getElementById('likeBtn');
-      const countEl = document.getElementById('likeCount');
-      const liked = localStorage.getItem(`liked_${id}`);
+    // LIKE
+    window.toggleLike = async function() {
+      const btn   = document.getElementById('likeBtn');
+      const count = document.getElementById('likeCount');
+      const liked = localStorage.getItem(`liked_${storyId}`);
       try {
-        const docRef = doc(db, 'historias', id);
+        const ref = doc(db,'historias',storyId);
         if (liked) {
-          await updateDoc(docRef, { likes: increment(-1) });
-          localStorage.removeItem(`liked_${id}`);
+          await updateDoc(ref, { likes: increment(-1) });
+          localStorage.removeItem(`liked_${storyId}`);
           btn.classList.remove('liked');
-          countEl.textContent = parseInt(countEl.textContent) - 1;
+          count.textContent = Math.max(0, parseInt(count.textContent)-1);
         } else {
-          await updateDoc(docRef, { likes: increment(1) });
-          localStorage.setItem(`liked_${id}`, '1');
+          await updateDoc(ref, { likes: increment(1) });
+          localStorage.setItem(`liked_${storyId}`, '1');
           btn.classList.add('liked');
-          countEl.textContent = parseInt(countEl.textContent) + 1;
+          count.textContent = parseInt(count.textContent)+1;
         }
-      } catch(e) {}
+      } catch(e) { window.showToast('Error: '+e.message,'error'); }
     };
 
-    window.shareStory = function(titulo) {
-      if (navigator.share) {
-        navigator.share({ title: titulo, url: window.location.href });
+    // SHARE
+    window.shareStory = function() {
+      if (navigator.share && storyData) {
+        navigator.share({ title: storyData.titulo, url: window.location.href });
       } else {
         navigator.clipboard.writeText(window.location.href);
-        if (window.showToast) window.showToast('🔗 Link copiado al portapapeles', 'success');
+        window.showToast('🔗 Enlace copiado al portapapeles.','success');
       }
     };
 
+    // LIGHTBOX
     window.openLightbox = function(src) {
       document.getElementById('lightboxImg').src = src;
-      document.getElementById('lightbox').classList.add('active');
+      document.getElementById('lightbox').classList.add('open');
     };
-    window.closeLightbox = function() {
-      document.getElementById('lightbox').classList.remove('active');
+    window.closeLightbox = function() { document.getElementById('lightbox').classList.remove('open'); };
+
+    // DELETE
+    window.openDeleteModal = function() { document.getElementById('deleteModal').classList.add('open'); };
+    window.closeModal = function(id) { document.getElementById(id).classList.remove('open'); };
+    window.confirmDelete = async function() {
+      try {
+        await deleteDoc(doc(db,'historias',storyId));
+        window.showToast('Historia eliminada.','info');
+        setTimeout(() => window.location.href = '/historias', 1200);
+      } catch(e) { window.showToast('Error: '+e.message,'error'); }
     };
 
+    // AUDIO main toggle
     window.toggleMainAudio = function() {
-      if (!window.__currentStory) return;
-      const text = window.__currentStory.titulo + '. ' + window.__currentStory.historia;
-      const voiceSelect = document.getElementById('mainVoiceSelect');
-      const voiceName = voiceSelect ? voiceSelect.value : '';
+      if (!storyData) return;
+      const text = `${storyData.titulo}. ${storyData.historia||''}`;
+      const voiceName = document.getElementById('mainVoiceSelect')?.value || '';
       if (window.toggleStoryAudio) {
-        window.toggleStoryAudio('main', window.__currentStory.titulo, text, 'mainPlayBtn', 'mainWaveform', 'mainAudioStatus', voiceName);
+        window.toggleStoryAudio('main', storyData.titulo, text, 'mainPlayBtn', 'mainWaveform', 'mainAudioStatus', voiceName);
       }
     };
-
-    function buildWaveform(id, bars) {
-      const el = document.getElementById(id);
-      if (!el) return;
-      el.innerHTML = Array.from({length: bars}, (_, i) => {
-        const h = Math.random() * 40 + 10;
-        return `<div class="wave-bar" style="height:${h}px;animation-delay:${(i * 0.05) % 0.5}s"></div>`;
-      }).join('');
-    }
-
-    // Check liked status
-    if (localStorage.getItem(`liked_${storyId}`)) {
-      setTimeout(() => {
-        const btn = document.getElementById('likeBtn');
-        if (btn) btn.classList.add('liked');
-      }, 1000);
-    }
-
-    loadStory();
   </script>
-
   <script src="/js/main.js"></script>
   <script src="/js/audio.js"></script>
 </body>
