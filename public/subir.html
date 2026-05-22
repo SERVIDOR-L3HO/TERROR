@@ -176,8 +176,8 @@
 
         <!-- FOTOS -->
         <div class="form-group" id="step2Content">
-          <label class="form-label">Evidencias Fotográficas <span style="color:var(--text-muted);font-size:0.75rem;">(Opcional — máx. 5 fotos)</span></label>
-          <p style="font-size:0.85rem;color:var(--text-muted);margin-bottom:1rem;">Sube fotos que respalden tu historia: capturas, lugares, objetos, lo que sea relevante.</p>
+          <label class="form-label">Evidencias Fotográficas <span style="color:var(--text-muted);font-size:0.75rem;">(Opcional — máx. 3 fotos)</span></label>
+          <p style="font-size:0.85rem;color:var(--text-muted);margin-bottom:1rem;">Sube fotos que respalden tu historia. Se comprimen automáticamente, sin costo extra.</p>
 
           <div class="file-upload-area" id="dropArea">
             <input type="file" id="fotosInput" accept="image/*" multiple>
@@ -185,7 +185,7 @@
             <div class="upload-text">
               <strong>Arrastra tus evidencias aquí</strong><br>
               o haz clic para seleccionar<br>
-              <small style="color:#2a1a1a;">JPG, PNG, WEBP — máx. 5MB por imagen</small>
+              <small style="color:#2a1a1a;">JPG, PNG, WEBP — máx. 3 fotos · se comprimen automáticamente</small>
             </div>
           </div>
 
@@ -230,7 +230,6 @@
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
     import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-    import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyBKCSSMZE3ybpyP1MSegm4nu1GUGQt9oNc",
@@ -244,11 +243,32 @@
 
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
-    const storage = getStorage(app);
     window.__db = db;
-    window.__storage = storage;
 
     let selectedFiles = [];
+
+    // ── Comprimir imagen en canvas → base64 (gratis, sin Storage) ──
+    function compressImage(file, maxWidth = 900, quality = 0.65) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = ev => {
+          const img = new Image();
+          img.onload = () => {
+            const scale = Math.min(1, maxWidth / img.width);
+            const canvas = document.createElement('canvas');
+            canvas.width  = Math.round(img.width  * scale);
+            canvas.height = Math.round(img.height * scale);
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+            resolve(canvas.toDataURL('image/jpeg', quality));
+          };
+          img.onerror = reject;
+          img.src = ev.target.result;
+        };
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+    }
 
     // Char counters
     document.getElementById('titulo').addEventListener('input', function() {
@@ -256,7 +276,6 @@
     });
     document.getElementById('historia').addEventListener('input', function() {
       document.getElementById('historiaCount').textContent = this.value.length.toLocaleString();
-      // Update steps
       if (this.value.length > 50) {
         document.getElementById('step1').classList.add('done');
         document.getElementById('step2').classList.add('active');
@@ -264,7 +283,7 @@
     });
 
     // File drop area
-    const dropArea = document.getElementById('dropArea');
+    const dropArea  = document.getElementById('dropArea');
     const fotosInput = document.getElementById('fotosInput');
 
     dropArea.addEventListener('dragover', e => { e.preventDefault(); dropArea.classList.add('dragover'); });
@@ -274,26 +293,26 @@
       dropArea.classList.remove('dragover');
       addFiles(Array.from(e.dataTransfer.files));
     });
-
     fotosInput.addEventListener('change', () => addFiles(Array.from(fotosInput.files)));
 
     function addFiles(files) {
       const imageFiles = files.filter(f => f.type.startsWith('image/'));
-      const remaining = 5 - selectedFiles.length;
-      const toAdd = imageFiles.slice(0, remaining);
+      const remaining  = 3 - selectedFiles.length;   // máx 3 para no superar límite de Firestore
+      const toAdd      = imageFiles.slice(0, remaining);
 
       if (imageFiles.length > remaining) {
-        showToast('⚠ Máximo 5 imágenes permitidas', 'error');
+        localToast('⚠ Máximo 3 imágenes permitidas', 'error');
       }
 
       toAdd.forEach(file => {
-        if (file.size > 5 * 1024 * 1024) {
-          showToast(`⚠ ${file.name} supera 5MB`, 'error');
+        if (file.size > 15 * 1024 * 1024) {
+          localToast(`⚠ ${file.name} es demasiado grande`, 'error');
           return;
         }
         selectedFiles.push(file);
+        // Preview sin comprimir (solo visual)
         const reader = new FileReader();
-        reader.onload = e => addPreview(e.target.result, selectedFiles.length - 1);
+        reader.onload = ev => addPreview(ev.target.result, selectedFiles.length - 1);
         reader.readAsDataURL(file);
       });
 
@@ -317,56 +336,49 @@
 
     window.removeFile = function(idx) {
       selectedFiles.splice(idx, 1);
-      const container = document.getElementById('previewContainer');
-      container.innerHTML = '';
+      document.getElementById('previewContainer').innerHTML = '';
       selectedFiles.forEach((f, i) => {
         const reader = new FileReader();
-        reader.onload = e => addPreview(e.target.result, i);
+        reader.onload = ev => addPreview(ev.target.result, i);
         reader.readAsDataURL(f);
       });
     };
 
-    // FORM SUBMIT
+    // ── SUBMIT ──
     document.getElementById('uploadForm').addEventListener('submit', async e => {
       e.preventDefault();
 
-      const titulo = document.getElementById('titulo').value.trim();
-      const autor = document.getElementById('autor').value.trim();
+      const titulo    = document.getElementById('titulo').value.trim();
+      const autor     = document.getElementById('autor').value.trim();
       const categoria = document.getElementById('categoria').value;
-      const historia = document.getElementById('historia').value.trim();
+      const historia  = document.getElementById('historia').value.trim();
 
       if (!titulo || !autor || !categoria || !historia) {
-        showToast('⚠ Completa todos los campos requeridos', 'error');
+        localToast('⚠ Completa todos los campos requeridos', 'error');
         return;
       }
-
       if (historia.length < 100) {
-        showToast('⚠ Tu historia debe tener al menos 100 caracteres', 'error');
+        localToast('⚠ Tu historia debe tener al menos 100 caracteres', 'error');
         return;
       }
 
-      const btn = document.getElementById('submitBtn');
+      const btn    = document.getElementById('submitBtn');
       const status = document.getElementById('submitStatus');
-      btn.disabled = true;
+      btn.disabled  = true;
       btn.textContent = '⏳ Enviando tu confesión...';
       status.style.display = 'block';
-      status.textContent = 'Guardando en las sombras...';
+      status.textContent   = 'Guardando en las sombras...';
 
       try {
-        // Upload images
-        const fotoUrls = [];
+        // Comprimir imágenes en el navegador (canvas → base64)
+        const fotosBase64 = [];
         if (selectedFiles.length > 0) {
           document.getElementById('uploadProgress').style.display = 'block';
           for (let i = 0; i < selectedFiles.length; i++) {
-            const file = selectedFiles[i];
-            const progress = ((i / selectedFiles.length) * 80);
-            document.getElementById('uploadProgressFill').style.width = `${progress}%`;
-            status.textContent = `Subiendo evidencia ${i+1} de ${selectedFiles.length}...`;
-
-            const storageRef = ref(storage, `evidencias/${Date.now()}_${file.name}`);
-            const snapshot = await uploadBytes(storageRef, file);
-            const url = await getDownloadURL(snapshot.ref);
-            fotoUrls.push(url);
+            status.textContent = `Comprimiendo evidencia ${i+1} de ${selectedFiles.length}...`;
+            document.getElementById('uploadProgressFill').style.width = `${((i+1)/selectedFiles.length)*80}%`;
+            const b64 = await compressImage(selectedFiles[i]);
+            fotosBase64.push(b64);
           }
           document.getElementById('uploadProgressFill').style.width = '90%';
         }
@@ -378,31 +390,29 @@
           autor,
           categoria,
           historia,
-          fotos: fotoUrls,
+          fotos: fotosBase64,      // base64 guardado directo en Firestore (gratis)
           createdAt: serverTimestamp(),
           views: 0,
           likes: 0
         });
 
         document.getElementById('uploadProgressFill').style.width = '100%';
-        btn.textContent = '✅ Confesión Registrada';
+        btn.textContent  = '✅ Confesión Registrada';
         status.textContent = '¡Tu historia ha sido guardada en las sombras!';
-        showToast('✅ Historia publicada exitosamente', 'success');
+        localToast('✅ Historia publicada exitosamente', 'success');
 
-        setTimeout(() => {
-          window.location.href = '/historias';
-        }, 2000);
+        setTimeout(() => { window.location.href = '/historias'; }, 2000);
 
       } catch (err) {
         console.error(err);
         btn.disabled = false;
         btn.textContent = '🩸 Confesar mi Terror';
         status.style.display = 'none';
-        showToast('❌ Error al publicar: ' + err.message, 'error');
+        localToast('❌ Error al publicar: ' + err.message, 'error');
       }
     });
 
-    function showToast(msg, type) {
+    function localToast(msg, type) {
       if (window.showToast) { window.showToast(msg, type); return; }
       const container = document.getElementById('toastContainer');
       const t = document.createElement('div');
