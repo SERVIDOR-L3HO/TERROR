@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VOCES DEL TERROR — Confiesa tu Miedo</title>
+  <meta name="description" content="Comparte tus experiencias de terror más oscuras. Historias reales de miedo con audio, fotos y evidencias.">
+  <link rel="stylesheet" href="/css/styles.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💀</text></svg>">
+</head>
+<body>
+
+  <!-- LOADING SCREEN -->
+  <div class="loading-overlay" id="loadingOverlay">
+    <div class="loading-logo">💀 VOCES DEL TERROR</div>
+    <div class="loading-bar"><div class="loading-bar-fill"></div></div>
+    <p style="font-family:'Special Elite',cursive;font-size:0.75rem;letter-spacing:4px;color:#5c0000;text-transform:uppercase;">Abriendo el portal...</p>
+  </div>
+
+  <!-- PARTICLES -->
+  <div class="particles-container" id="particles"></div>
+
+  <!-- NAVBAR -->
+  <nav class="navbar">
+    <a href="/" class="nav-logo">💀 <span>VOCES</span> DEL TERROR</a>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="/">Inicio</a></li>
+      <li><a href="/historias">Historias</a></li>
+      <li><a href="/subir" class="btn-nav">+ Confesar</a></li>
+    </ul>
+    <button class="hamburger" id="hamburger" aria-label="Menú">
+      <span></span><span></span><span></span>
+    </button>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-bg"></div>
+    <div class="drip-container" id="drips"></div>
+    <div class="hero-content">
+      <p class="hero-eyebrow">⚠ Historias Reales de Terror ⚠</p>
+      <h1 class="hero-title">VOCES<br><span class="blood">DEL</span><br>TERROR</h1>
+      <p class="hero-subtitle">"Las sombras tienen memoria... y tú has dejado tu huella en ellas"</p>
+      <div class="hero-buttons">
+        <a href="/historias" class="btn-primary">👁 Leer Historias</a>
+        <a href="/subir" class="btn-secondary">🩸 Contar la Tuya</a>
+      </div>
+    </div>
+    <div class="scroll-indicator">Descender</div>
+  </section>
+
+  <!-- STATS BAR -->
+  <div class="stats-bar">
+    <div class="stat-item">
+      <span class="stat-number" id="statHistorias">0</span>
+      <span class="stat-label">Historias</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-number" id="statEvidencias">0</span>
+      <span class="stat-label">Evidencias</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-number" id="statAlmas">666+</span>
+      <span class="stat-label">Almas Atrapadas</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-number">∞</span>
+      <span class="stat-label">Pesadillas</span>
+    </div>
+  </div>
+
+  <!-- FEATURED STORY -->
+  <div class="section">
+    <div id="featuredContainer"></div>
+
+    <!-- RECENT STORIES -->
+    <div class="section-header fade-in">
+      <span class="section-eyebrow">— Recién Confessado —</span>
+      <h2 class="section-title">Últimas Historias</h2>
+      <div class="section-divider"></div>
+    </div>
+
+    <div class="stories-grid" id="storiesGrid">
+      <div class="empty-state" id="loadingStories">
+        <span class="empty-state-icon">⏳</span>
+        <h3>Invocando historias...</h3>
+      </div>
+    </div>
+
+    <div style="text-align:center;margin-top:3rem;">
+      <a href="/historias" class="btn-primary">Ver todas las historias</a>
+    </div>
+  </div>
+
+  <!-- CATEGORIES -->
+  <div style="background: linear-gradient(135deg, #050005, #060006); padding: 6rem 2rem; border-top: 1px solid #0d000d;">
+    <div style="max-width:1200px;margin:0 auto;">
+      <div class="section-header fade-in">
+        <span class="section-eyebrow">— Explora por Categoría —</span>
+        <h2 class="section-title" style="text-shadow: 0 0 20px rgba(155,89,182,0.4);">Tipos de Horror</h2>
+        <div class="section-divider" style="background: linear-gradient(to right, transparent, #6c0b9e, transparent);"></div>
+      </div>
+      <div class="categories-grid fade-in">
+        <a href="/historias?cat=aparicion" class="category-card">
+          <span class="category-icon">👻</span>
+          <div class="category-name">Apariciones</div>
+          <div class="category-count">Espíritus y Fantasmas</div>
+        </a>
+        <a href="/historias?cat=demonio" class="category-card">
+          <span class="category-icon">😈</span>
+          <div class="category-name">Demonios</div>
+          <div class="category-count">Entidades Oscuras</div>
+        </a>
+        <a href="/historias?cat=extraterrestre" class="category-card">
+          <span class="category-icon">👽</span>
+          <div class="category-name">Extraterrestres</div>
+          <div class="category-count">Más Allá del Cielo</div>
+        </a>
+        <a href="/historias?cat=maldicion" class="category-card">
+          <span class="category-icon">🪄</span>
+          <div class="category-name">Maldiciones</div>
+          <div class="category-count">Hechizos y Brujas</div>
+        </a>
+        <a href="/historias?cat=paranormal" class="category-card">
+          <span class="category-icon">🔮</span>
+          <div class="category-name">Paranormal</div>
+          <div class="category-count">Sin Explicación</div>
+        </a>
+        <a href="/historias?cat=asesino" class="category-card">
+          <span class="category-icon">🔪</span>
+          <div class="category-name">Asesinos</div>
+          <div class="category-count">Horror Real</div>
+        </a>
+        <a href="/historias?cat=suenos" class="category-card">
+          <span class="category-icon">😴</span>
+          <div class="category-name">Sueños</div>
+          <div class="category-count">Pesadillas</div>
+        </a>
+        <a href="/historias?cat=otro" class="category-card">
+          <span class="category-icon">❓</span>
+          <div class="category-name">Otro</div>
+          <div class="category-count">Lo Inexplicable</div>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- CTA SECTION -->
+  <div style="text-align:center; padding: 6rem 2rem; background: radial-gradient(ellipse at center, #0d0000 0%, #050505 70%);">
+    <span class="section-eyebrow">— ¿Tienes algo que confesar? —</span>
+    <h2 style="font-family:'Creepster',cursive;font-size:clamp(2rem,5vw,4rem);color:var(--text-primary);text-shadow:var(--glow-red);margin:1rem 0 0.5rem;">
+      Comparte tu Terror
+    </h2>
+    <p style="color:var(--text-muted);font-style:italic;margin-bottom:2.5rem;font-size:1.1rem;">
+      "Lo que no se cuenta se pudre en el alma..."
+    </p>
+    <a href="/subir" class="btn-primary" style="font-size:1.1rem;padding:18px 48px;">
+      🩸 Confesar Ahora
+    </a>
+  </div>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="footer-logo">💀</div>
+    <p class="footer-tagline">Voces del Terror — Donde el miedo encuentra su voz</p>
+    <div class="footer-links">
+      <a href="/">Inicio</a>
+      <a href="/historias">Historias</a>
+      <a href="/subir">Subir Historia</a>
+    </div>
+    <div class="footer-bottom">
+      <p>⚠ Contenido perturbador. Solo para adultos. Las historias son experiencias personales de los usuarios.</p>
+      <p style="margin-top:0.5rem;color:#2a1a1a;">© 2024 Voces del Terror. Todos los derechos reservados al infierno.</p>
+    </div>
+  </footer>
+
+  <!-- TOAST -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- FIREBASE -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getFirestore, collection, getDocs, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { getStorage } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyBKCSSMZE3ybpyP1MSegm4nu1GUGQt9oNc",
+      authDomain: "terror-6f51e.firebaseapp.com",
+      projectId: "terror-6f51e",
+      storageBucket: "terror-6f51e.firebasestorage.app",
+      messagingSenderId: "127086938530",
+      appId: "1:127086938530:web:bcd051bcf8766e9b214afb",
+      measurementId: "G-K3J8MKZQ94"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const storage = getStorage(app);
+    window.__db = db;
+    window.__storage = storage;
+
+    async function loadHomeData() {
+      try {
+        const q = query(collection(db, 'historias'), orderBy('createdAt', 'desc'), limit(6));
+        const snapshot = await getDocs(q);
+        const historias = [];
+        snapshot.forEach(doc => historias.push({ id: doc.id, ...doc.data() }));
+
+        // Stats
+        const allQ = await getDocs(collection(db, 'historias'));
+        let totalEvidencias = 0;
+        allQ.forEach(doc => {
+          const d = doc.data();
+          if (d.fotos && d.fotos.length) totalEvidencias += d.fotos.length;
+        });
+        animateNumber('statHistorias', allQ.size);
+        animateNumber('statEvidencias', totalEvidencias);
+
+        // Featured (first story)
+        const featuredContainer = document.getElementById('featuredContainer');
+        if (historias.length > 0) {
+          const feat = historias[0];
+          const imgHtml = feat.fotos && feat.fotos.length
+            ? `<img src="${feat.fotos[0]}" alt="${feat.titulo}" class="featured-image">`
+            : `<div class="featured-no-image">💀</div>`;
+          featuredContainer.innerHTML = `
+            <a href="/historia/${feat.id}" class="featured-story" style="text-decoration:none;color:inherit;">
+              ${imgHtml}
+              <div class="featured-content">
+                <div class="featured-category">${feat.categoria || 'Paranormal'}</div>
+                <h2 class="featured-title">${feat.titulo}</h2>
+                <p class="featured-excerpt">${(feat.historia || '').substring(0, 200)}...</p>
+                <div style="display:flex;gap:1rem;align-items:center;">
+                  <span class="btn-primary" style="display:inline-block;">Leer Historia</span>
+                  ${feat.fotos && feat.fotos.length ? `<span style="font-family:'Special Elite',cursive;font-size:0.75rem;color:var(--text-muted);">📸 ${feat.fotos.length} evidencias</span>` : ''}
+                </div>
+              </div>
+            </a>`;
+        }
+
+        // Stories grid (skip first one for featured)
+        const grid = document.getElementById('storiesGrid');
+        const rest = historias.length > 1 ? historias.slice(1) : historias;
+        if (rest.length === 0) {
+          grid.innerHTML = `<div class="empty-state" style="grid-column:1/-1">
+            <span class="empty-state-icon">👻</span>
+            <h3>Las sombras aún están vacías...</h3>
+            <p style="margin-top:1rem;"><a href="/subir" class="btn-primary">Sé el primero en confesar</a></p>
+          </div>`;
+        } else {
+          grid.innerHTML = rest.map(h => buildCard(h)).join('');
+        }
+
+      } catch (e) {
+        console.error(e);
+        document.getElementById('storiesGrid').innerHTML = `<div class="empty-state" style="grid-column:1/-1">
+          <span class="empty-state-icon">⚠️</span>
+          <h3>Error al cargar historias</h3>
+          <p style="color:var(--text-muted);font-size:0.9rem;margin-top:0.5rem;">Configura las reglas de Firestore en Firebase Console.</p>
+        </div>`;
+      }
+    }
+
+    function buildCard(h) {
+      const imgHtml = h.fotos && h.fotos.length
+        ? `<img src="${h.fotos[0]}" alt="${h.titulo}" class="card-image" loading="lazy">`
+        : `<div class="card-no-image">💀</div>`;
+      const dateStr = h.createdAt ? new Date(h.createdAt.seconds * 1000).toLocaleDateString('es-ES', {day:'numeric',month:'short',year:'numeric'}) : '';
+      return `
+        <a href="/historia/${h.id}" class="story-card fade-in">
+          ${imgHtml}
+          <div class="card-content">
+            <div class="card-category">${h.categoria || 'Paranormal'}</div>
+            <h3 class="card-title">${h.titulo}</h3>
+            <p class="card-excerpt">${(h.historia || '').substring(0, 150)}...</p>
+            <div class="card-meta">
+              <span>Por ${h.autor || 'Anónimo'}</span>
+              <span>${dateStr}</span>
+            </div>
+            <div class="mini-player" onclick="event.preventDefault(); playCardAudio('${h.id}', \`${h.titulo}\`, \`${(h.historia||'').substring(0,300).replace(/`/g,'\'')}\`)">
+              <button class="mini-play" id="miniplay-${h.id}">▶</button>
+              <div class="mini-wave" id="miniwave-${h.id}">
+                <span style="height:8px"></span><span style="height:14px"></span><span style="height:10px"></span><span style="height:16px"></span><span style="height:8px"></span>
+              </div>
+              <span style="font-family:'Special Elite',cursive;font-size:0.65rem;color:#9b59b6;letter-spacing:1px;">ESCUCHAR</span>
+            </div>
+          </div>
+        </a>`;
+    }
+
+    function animateNumber(id, target) {
+      const el = document.getElementById(id);
+      if (!el || target === 0) return;
+      let current = 0;
+      const step = Math.max(1, Math.floor(target / 40));
+      const timer = setInterval(() => {
+        current = Math.min(current + step, target);
+        el.textContent = current;
+        if (current >= target) clearInterval(timer);
+      }, 50);
+    }
+
+    loadHomeData();
+  </script>
+
+  <script src="/js/main.js"></script>
+  <script src="/js/audio.js"></script>
+</body>
+</html>
