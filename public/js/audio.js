@@ -2,12 +2,12 @@
 // HORROR AUDIO ENGINE — Voice Synthesis + Presets
 // ═══════════════════════════════════════════════
 
-// TikTok horror style = natural human pitch, slightly slow rate, clear voice
+// TikTok horror style: natural pitch 1.0, clear & slightly slow — like real TikTok horror narrators
 const PRESETS = {
-  tiktok:   { rate: 0.86, pitch: 0.92, label: 'TikTok',   icon: '📱', desc: 'Natural & escalofriante' },
-  ritual:   { rate: 0.74, pitch: 0.88, label: 'Ritual',   icon: '💀', desc: 'Pausado & oscuro'        },
-  susurro:  { rate: 0.78, pitch: 1.05, label: 'Susurro',  icon: '👁',  desc: 'Íntimo & tenso'         },
-  narrador: { rate: 0.82, pitch: 0.82, label: 'Narrador', icon: '🎙',  desc: 'Profundo & sombrío'     },
+  tiktok:   { rate: 0.88, pitch: 1.00, label: 'TikTok',   icon: '📱', desc: 'Natural & claro'     },
+  dramatico:{ rate: 0.80, pitch: 0.95, label: 'Dramático', icon: '🕯', desc: 'Suave & tenso'       },
+  ritual:   { rate: 0.72, pitch: 0.90, label: 'Ritual',   icon: '💀', desc: 'Pausado & grave'      },
+  susurro:  { rate: 0.75, pitch: 1.08, label: 'Susurro',  icon: '👁',  desc: 'Íntimo & susurrante' },
 };
 let activePreset    = 'tiktok';
 let currentPlayingId = null;
@@ -113,14 +113,37 @@ function resetWave(id) {
 }
 
 // ── Voice picker ──
+// Priority order for best natural Spanish voices (TikTok-style clarity)
+const VOICE_PRIORITY = [
+  'Google español de Estados Unidos',
+  'Google español',
+  'Microsoft Sabina Online (Natural)',
+  'Microsoft Sabina',
+  'Mónica',
+  'Microsoft Pablo Online (Natural)',
+  'Microsoft Pablo',
+  'Paulina',
+  'Jorge',
+  'Google español de Argentina',
+  'Google Spanish',
+];
+
 function pickVoice(selId) {
   const sel = document.getElementById(selId);
   const name = sel ? sel.value : '';
+  // User manually selected a voice
   if (name) {
     const v = availableVoices.find(v => v.name === name);
     if (v) return v;
   }
-  return availableVoices.find(v => v.lang.startsWith('es')) || null;
+  // Try priority list first for best natural TikTok-style voice
+  for (const pname of VOICE_PRIORITY) {
+    const v = availableVoices.find(v => v.name.toLowerCase().includes(pname.toLowerCase()));
+    if (v) return v;
+  }
+  // Any Spanish voice
+  const esVoice = availableVoices.find(v => v.lang.startsWith('es'));
+  return esVoice || null;
 }
 
 function buildUtterance(text, selId) {
