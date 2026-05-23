@@ -124,7 +124,7 @@
     import { initAuth, doSignOut, toggleDropdown, initials, currentUser } from '/js/auth.js';
     import {
       doc, getDoc, getDocs, collection, query, where,
-      orderBy, updateDoc, deleteDoc, serverTimestamp
+      updateDoc, deleteDoc, serverTimestamp
     } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
     window.__so = doSignOut;
@@ -180,10 +180,11 @@
 
     async function loadUserStories(uid) {
       try {
-        const q = query(collection(db, 'historias'), where('autorId','==',uid), orderBy('createdAt','desc'));
+        const q = query(collection(db, 'historias'), where('autorId','==',uid));
         const snap = await getDocs(q);
         const stories = [];
         snap.forEach(d => stories.push({ id: d.id, ...d.data() }));
+        stories.sort((a,b) => (b.createdAt?.seconds||0) - (a.createdAt?.seconds||0));
 
         document.getElementById('profileStoriesTitle').textContent = `${stories.length} Confesión${stories.length!==1?'es':''}`;
         document.getElementById('profileStats').innerHTML = `
@@ -202,7 +203,12 @@
 
         grid.innerHTML = stories.map(h => buildCard(h)).join('');
       } catch(e) {
-        document.getElementById('profileGrid').innerHTML = `<div class="empty-state" style="grid-column:1/-1"><p class="empty-sub">Error: ${e.message}</p></div>`;
+        console.error(e);
+        document.getElementById('profileGrid').innerHTML = `<div class="empty-state" style="grid-column:1/-1">
+          <div class="empty-icon">⚠️</div>
+          <h3 class="empty-title">No se pudieron cargar las historias</h3>
+          <p class="empty-sub">Verifica tu conexión e intenta de nuevo.</p>
+        </div>`;
       }
     }
 
