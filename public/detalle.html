@@ -217,22 +217,8 @@
 
         <div class="story-body-wrap">
 
-          <!-- AUDIO PLAYER -->
-          <div class="audio-player">
-            <div class="audio-player-header">
-              <div class="audio-icon">🎙</div>
-              <div>
-                <div class="audio-player-title">Narrador — Escucha esta Historia</div>
-                <div class="audio-player-sub">Síntesis de voz del navegador</div>
-              </div>
-            </div>
-            <div class="audio-controls-row">
-              <button type="button" class="audio-play-btn" id="mainPlayBtn" onclick="toggleMainAudio()">▶</button>
-              <div class="audio-waveform" id="mainWaveform"></div>
-              <span class="audio-status-text" id="mainAudioStatus">Listo</span>
-            </div>
-            <select class="voice-picker" id="mainVoiceSelect"></select>
-          </div>
+          <!-- AUDIO PLAYER (built by audio.js) -->
+          <div id="audioPlayerMount"></div>
 
           <!-- STORY BODY -->
           <div class="story-body">${bodyHtml}</div>
@@ -260,11 +246,16 @@
           </div>
         </div>`;
 
-      // Build waveform
+      // Build audio player
       setTimeout(() => {
-        if (window.buildWaveform) window.buildWaveform('mainWaveform', 50);
-        if (window.populateVoices) window.populateVoices('mainVoiceSelect');
-      }, 300);
+        const mount = document.getElementById('audioPlayerMount');
+        if (mount && window.buildVoicePanel) {
+          mount.innerHTML = window.buildVoicePanel('mainPlayBtn','mainWaveform','mainAudioStatus','mainVoiceSelect');
+          window.__onAudioPlay = window.toggleMainAudio;
+          if (window.buildWaveform)  window.buildWaveform('mainWaveform', 50);
+          if (window.populateVoices) window.populateVoices('mainVoiceSelect');
+        }
+      }, 350);
     }
 
     async function loadRelated(categoria, currentId) {

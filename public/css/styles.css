@@ -1024,3 +1024,243 @@ input, textarea, select { font-family: inherit; }
   .story-actions { gap: 4px; }
   .action-btn { padding: 5px 8px; font-size: 0.72rem; }
 }
+
+/* ═══════════════════════════════════════════════════
+   GLASS DESIGN SYSTEM — Dark Horror Glass
+══════════════════════════════════════════════════════ */
+
+/* ── Navbar glass ── */
+.navbar {
+  background: rgba(5,7,10,0.75) !important;
+  backdrop-filter: blur(24px) saturate(160%);
+  -webkit-backdrop-filter: blur(24px) saturate(160%);
+  border-bottom: 1px solid rgba(155,28,28,0.15) !important;
+  box-shadow: 0 1px 0 rgba(255,255,255,0.03), 0 4px 30px rgba(0,0,0,0.4);
+}
+
+/* ── Story cards glass ── */
+.story-card {
+  background: rgba(10,12,18,0.7) !important;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255,255,255,0.05) !important;
+  box-shadow: 0 2px 20px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.04);
+  transition: border-color 0.3s, box-shadow 0.3s, transform 0.25s !important;
+}
+.story-card:hover {
+  border-color: rgba(155,28,28,0.4) !important;
+  box-shadow: 0 8px 40px rgba(0,0,0,0.6), 0 0 0 1px rgba(155,28,28,0.15), inset 0 1px 0 rgba(255,255,255,0.06) !important;
+  transform: translateY(-4px) !important;
+}
+.card-body { background: transparent; }
+
+/* ── Featured card glass ── */
+.featured-card {
+  background: rgba(10,12,18,0.6) !important;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255,255,255,0.06) !important;
+  box-shadow: 0 4px 40px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.04);
+}
+
+/* ── Stats bar glass ── */
+.stats-bar {
+  background: rgba(8,10,15,0.8) !important;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-top: 1px solid rgba(255,255,255,0.04) !important;
+  border-bottom: 1px solid rgba(255,255,255,0.04) !important;
+}
+.stat { background: rgba(155,28,28,0.04); border-radius: 8px; padding: 0.75rem 1rem; }
+
+/* ── Audio player glass ── */
+.audio-player {
+  background: rgba(8,10,16,0.85) !important;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(155,28,28,0.2) !important;
+  box-shadow: 0 4px 32px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.04) !important;
+}
+
+/* ── Auth box glass ── */
+.auth-box {
+  background: rgba(8,10,16,0.88) !important;
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(255,255,255,0.07) !important;
+  box-shadow: 0 8px 64px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.06) !important;
+}
+
+/* ── Form section glass ── */
+.form-section {
+  background: rgba(8,10,16,0.82) !important;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255,255,255,0.06) !important;
+  box-shadow: 0 4px 40px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.03) !important;
+}
+
+/* ── Glass inputs ── */
+.form-input, .form-textarea, .form-select {
+  background: rgba(255,255,255,0.04) !important;
+  border: 1px solid rgba(255,255,255,0.08) !important;
+  backdrop-filter: blur(4px);
+}
+.form-input:focus, .form-textarea:focus, .form-select:focus {
+  background: rgba(155,28,28,0.05) !important;
+  border-color: rgba(155,28,28,0.5) !important;
+  box-shadow: 0 0 0 3px rgba(155,28,28,0.08), inset 0 1px 0 rgba(255,255,255,0.04) !important;
+}
+
+/* ── Modal glass ── */
+.modal {
+  background: rgba(8,10,16,0.9) !important;
+  backdrop-filter: blur(28px);
+  -webkit-backdrop-filter: blur(28px);
+  border: 1px solid rgba(255,255,255,0.08) !important;
+  box-shadow: 0 20px 80px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.06) !important;
+}
+
+/* ── Dropdown glass ── */
+.nav-dropdown {
+  background: rgba(8,10,18,0.95) !important;
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(255,255,255,0.08) !important;
+  box-shadow: 0 16px 48px rgba(0,0,0,0.6) !important;
+}
+
+/* ── Filter chips glass ── */
+.filter-chip {
+  background: rgba(255,255,255,0.03) !important;
+  border: 1px solid rgba(255,255,255,0.08) !important;
+  backdrop-filter: blur(4px);
+}
+.filter-chip:hover {
+  background: rgba(255,255,255,0.07) !important;
+  border-color: rgba(255,255,255,0.14) !important;
+}
+.filter-chip.active {
+  background: rgba(155,28,28,0.85) !important;
+  border-color: rgba(155,28,28,0.9) !important;
+  box-shadow: 0 2px 12px rgba(155,28,28,0.3) !important;
+}
+
+/* ── Hero glass panel ── */
+.hero-content {
+  background: rgba(5,7,10,0.35);
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+  border-radius: 20px;
+  border: 1px solid rgba(255,255,255,0.04);
+  padding: 3rem 3.5rem !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.05), 0 0 80px rgba(155,28,28,0.06);
+}
+@media (max-width: 768px) {
+  .hero-content { padding: 2rem 1.5rem !important; border-radius: 14px; }
+}
+
+/* ── Category items glass ── */
+.category-item {
+  background: rgba(10,12,18,0.7) !important;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255,255,255,0.05) !important;
+}
+.category-item:hover {
+  background: rgba(155,28,28,0.08) !important;
+  border-color: rgba(155,28,28,0.25) !important;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.4) !important;
+}
+
+/* ── Profile header glass ── */
+.profile-header {
+  background: linear-gradient(to bottom, rgba(20,8,8,0.4) 0%, transparent 100%);
+}
+
+/* ── Comment form glass ── */
+.comment-form {
+  background: rgba(8,10,16,0.75) !important;
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255,255,255,0.07) !important;
+}
+
+/* ── Toast glass ── */
+.toast {
+  background: rgba(8,10,18,0.92) !important;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255,255,255,0.1) !important;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.5) !important;
+}
+.toast.success { border-color: rgba(22,163,74,0.5) !important; }
+.toast.error   { border-color: rgba(155,28,28,0.5) !important; }
+
+/* ── File drop zone glass ── */
+.file-drop {
+  background: rgba(255,255,255,0.02) !important;
+  border: 2px dashed rgba(255,255,255,0.1) !important;
+}
+.file-drop:hover, .file-drop.dragover {
+  background: rgba(155,28,28,0.04) !important;
+  border-color: rgba(155,28,28,0.35) !important;
+}
+
+/* ══════════════════════════════
+   HORROR VOICE PICKER COMPONENT
+══════════════════════════════ */
+.voice-panel {
+  background: rgba(5,7,12,0.8);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(155,28,28,0.18);
+  border-radius: 10px;
+  padding: 1.1rem;
+  margin-top: 1rem;
+}
+.voice-panel-label {
+  font-size: 0.68rem; font-weight: 600; letter-spacing: 2px;
+  text-transform: uppercase; color: var(--text-3); margin-bottom: 0.85rem;
+}
+.voice-presets-grid {
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+@media (max-width: 480px) { .voice-presets-grid { grid-template-columns: repeat(2, 1fr); } }
+.preset-btn {
+  display: flex; flex-direction: column; align-items: center; gap: 4px;
+  padding: 0.7rem 0.5rem;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 8px; cursor: pointer;
+  transition: all 0.2s; text-align: center;
+  backdrop-filter: blur(4px);
+}
+.preset-btn:hover {
+  background: rgba(155,28,28,0.08);
+  border-color: rgba(155,28,28,0.25);
+}
+.preset-btn.active {
+  background: rgba(155,28,28,0.18);
+  border-color: rgba(155,28,28,0.5);
+  box-shadow: 0 0 16px rgba(155,28,28,0.2), inset 0 1px 0 rgba(255,255,255,0.06);
+}
+.preset-btn.active .preset-name { color: var(--accent); }
+.preset-icon { font-size: 1.3rem; line-height: 1; }
+.preset-name { font-size: 0.75rem; font-weight: 600; color: var(--text-2); }
+.preset-desc { font-size: 0.62rem; color: var(--text-3); line-height: 1.3; }
+
+.voice-select-row {
+  display: flex; align-items: center; gap: 8px;
+}
+.voice-select-label { font-size: 0.72rem; color: var(--text-3); white-space: nowrap; flex-shrink: 0; }
+.voice-select-simple {
+  flex: 1; background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  color: var(--text-2); padding: 7px 10px;
+  border-radius: 6px; font-size: 0.8rem;
+  backdrop-filter: blur(4px);
+  transition: border-color 0.2s;
+  cursor: pointer;
+}
+.voice-select-simple:focus { outline: none; border-color: rgba(155,28,28,0.4); }
+.voice-select-simple option { background: #0c0f14; }

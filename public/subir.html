@@ -138,19 +138,8 @@
           <!-- PREVIEW AUDIO -->
           <div class="form-group">
             <label class="form-label">Vista previa de Audio</label>
-            <p class="form-hint" style="margin-bottom:0.75rem;">Así sonará tu historia para los oyentes. Selecciona una voz y haz clic en reproducir.</p>
-            <div class="audio-player">
-              <div class="audio-player-header">
-                <div class="audio-icon">🎙</div>
-                <div><div class="audio-player-title">Narrador del Terror</div><div class="audio-player-sub">Síntesis de voz del navegador</div></div>
-              </div>
-              <div class="audio-controls-row">
-                <button type="button" class="audio-play-btn" id="previewPlayBtn" onclick="previewAudio()">▶</button>
-                <div class="audio-waveform" id="previewWaveform"></div>
-                <span class="audio-status-text" id="previewStatus">Listo</span>
-              </div>
-              <select class="voice-picker" id="voiceSelect"></select>
-            </div>
+            <p class="form-hint" style="margin-bottom:0.75rem;">Elige un tono y escucha cómo sonarás para los lectores.</p>
+            <div id="previewAudioMount"></div>
           </div>
 
           <!-- TÉRMINOS -->
@@ -406,5 +395,23 @@
   </script>
   <script src="/js/main.js"></script>
   <script src="/js/audio.js"></script>
+  <script>
+    // Mount the preview audio player once audio.js is ready
+    (function tryMount(attempts) {
+      if (window.buildVoicePanel) {
+        const mount = document.getElementById('previewAudioMount');
+        if (mount) {
+          mount.innerHTML = window.buildVoicePanel('previewPlayBtn','previewWaveform','previewStatus','voiceSelect');
+          // Wire play button
+          const btn = document.getElementById('previewPlayBtn');
+          if (btn) btn.onclick = window.previewAudio;
+          if (window.buildWaveform)  window.buildWaveform('previewWaveform', 40);
+          if (window.populateVoices) window.populateVoices('voiceSelect');
+        }
+      } else if (attempts < 20) {
+        setTimeout(() => tryMount(attempts + 1), 100);
+      }
+    })(0);
+  </script>
 </body>
 </html>

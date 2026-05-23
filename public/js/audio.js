@@ -1,137 +1,178 @@
-// ═══════════════════════════════
-// AUDIO ENGINE — Text to Speech
-// ═══════════════════════════════
+// ═══════════════════════════════════════════════
+// HORROR AUDIO ENGINE — Voice Synthesis + Presets
+// ═══════════════════════════════════════════════
 
-let currentPlayingId  = null;
-let isPlaying         = false;
-let currentUtterance  = null;
-let availableVoices   = [];
-let waveformInterval  = null;
+const PRESETS = {
+  ritual:   { rate: 0.72, pitch: 0.35, label: 'Ritual',   icon: '💀', desc: 'Lento & profundo'   },
+  espectro: { rate: 0.60, pitch: 0.65, label: 'Espectro', icon: '👻', desc: 'Muy lento & suave'  },
+  demonio:  { rate: 0.88, pitch: 0.18, label: 'Demonio',  icon: '😈', desc: 'Grave & oscuro'     },
+  narrador: { rate: 0.80, pitch: 0.55, label: 'Narrador', icon: '🕯', desc: 'Claro & sombrío'    },
+};
+let activePreset    = 'ritual';
+let currentPlayingId = null;
+let isPlaying        = false;
+let currentUtterance = null;
+let availableVoices  = [];
+let waveformInterval = null;
 
-// Load voices
+// ── Load & filter voices ──
 function loadVoices() {
   availableVoices = window.speechSynthesis.getVoices();
   if (!availableVoices.length) {
     window.speechSynthesis.onvoiceschanged = () => {
       availableVoices = window.speechSynthesis.getVoices();
-      document.querySelectorAll('.voice-picker').forEach(sel => window.populateVoices(sel.id || sel));
+      document.querySelectorAll('.voice-select-simple, .voice-picker').forEach(s => populateSelect(s));
     };
   } else {
-    document.querySelectorAll('.voice-picker').forEach(sel => window.populateVoices(sel.id || sel));
+    document.querySelectorAll('.voice-select-simple, .voice-picker').forEach(s => populateSelect(s));
   }
 }
 
-window.populateVoices = function(selectIdOrEl) {
-  const sel = typeof selectIdOrEl === 'string' ? document.getElementById(selectIdOrEl) : selectIdOrEl;
+function populateSelect(sel) {
   if (!sel) return;
-  const current = sel.value;
-  sel.innerHTML = '<option value="">🎙 Voz automática del sistema</option>';
+  const saved = sel.value;
+  sel.innerHTML = '<option value="">🎙 Voz del sistema</option>';
 
-  const esVoices = availableVoices.filter(v => v.lang.startsWith('es') || v.name.toLowerCase().includes('spanish'));
-  const other    = availableVoices.filter(v => !v.lang.startsWith('es') && !v.name.toLowerCase().includes('spanish'));
+  const es = availableVoices.filter(v => v.lang.startsWith('es'));
+  if (es.length) {
+    const g = document.createElement('optgroup');
+    g.label = '🇪🇸 Español';
+    es.forEach(v => {
+      const o = document.createElement('option');
+      o.value = v.name;
+      // Clean name for display
+      let name = v.name.replace(/Microsoft |Google |Apple /gi,'').trim();
+      o.textContent = name;
+      g.appendChild(o);
+    });
+    sel.appendChild(g);
+  }
 
-  if (esVoices.length) {
-    const grp = document.createElement('optgroup');
-    grp.label = '🇪🇸 Voces en Español';
-    esVoices.forEach(v => { const o = document.createElement('option'); o.value = v.name; o.textContent = `${v.name} (${v.lang})`; grp.appendChild(o); });
-    sel.appendChild(grp);
+  // If no Spanish voices, add best English options
+  if (!es.length) {
+    const eng = availableVoices.filter(v => v.lang.startsWith('en')).slice(0, 6);
+    if (eng.length) {
+      const g = document.createElement('optgroup');
+      g.label = '🌐 English';
+      eng.forEach(v => {
+        const o = document.createElement('option');
+        o.value = v.name;
+        o.textContent = v.name.replace(/Microsoft |Google |Apple /gi,'').trim();
+        g.appendChild(o);
+      });
+      sel.appendChild(g);
+    }
   }
-  if (other.length) {
-    const grp = document.createElement('optgroup');
-    grp.label = '🌍 Otras Voces';
-    other.slice(0,8).forEach(v => { const o = document.createElement('option'); o.value = v.name; o.textContent = `${v.name} (${v.lang})`; grp.appendChild(o); });
-    sel.appendChild(grp);
-  }
-  if (current) sel.value = current;
+  if (saved) sel.value = saved;
+}
+
+window.populateVoices = function(idOrEl) {
+  const el = typeof idOrEl === 'string' ? document.getElementById(idOrEl) : idOrEl;
+  if (el) populateSelect(el);
 };
 
-// Build waveform bars
-window.buildWaveform = function(containerId, bars = 40) {
-  const el = document.getElementById(containerId);
+// ── Apply horror preset ──
+window.applyVoicePreset = function(btn) {
+  document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  activePreset = btn.dataset.preset;
+};
+
+// ── Waveform ──
+window.buildWaveform = function(id, bars = 44) {
+  const el = document.getElementById(id);
   if (!el) return;
   el.innerHTML = Array.from({ length: bars }, (_, i) => {
-    const h = Math.sin(i * 0.5) * 15 + Math.random() * 15 + 6;
+    const h = Math.sin(i * 0.55) * 14 + Math.random() * 12 + 5;
     return `<div class="wave-bar" style="height:${h}px;"></div>`;
   }).join('');
 };
 
-function startWaveAnim(containerId) {
-  stopWaveAnim();
+function animateWave(id) {
+  stopWave();
   waveformInterval = setInterval(() => {
-    const el = document.getElementById(containerId);
-    if (!el) { stopWaveAnim(); return; }
+    const el = document.getElementById(id);
+    if (!el) { stopWave(); return; }
     el.querySelectorAll('.wave-bar').forEach(b => {
-      b.style.height = (Math.random() * 34 + 6) + 'px';
+      b.style.height = (Math.random() * 32 + 5) + 'px';
       b.classList.add('active');
     });
-  }, 110);
+  }, 100);
 }
 
-function stopWaveAnim() {
+function stopWave() {
   if (waveformInterval) { clearInterval(waveformInterval); waveformInterval = null; }
 }
 
-function resetWave(containerId) {
-  stopWaveAnim();
-  const el = document.getElementById(containerId);
+function resetWave(id) {
+  stopWave();
+  const el = document.getElementById(id);
   if (!el) return;
-  el.querySelectorAll('.wave-bar').forEach(b => { b.classList.remove('active'); b.style.height = '8px'; });
+  el.querySelectorAll('.wave-bar').forEach(b => { b.classList.remove('active'); b.style.height = '6px'; });
 }
 
-function pickVoice(name) {
-  if (!availableVoices.length) return null;
-  if (name) { const v = availableVoices.find(v => v.name === name); if (v) return v; }
+// ── Voice picker ──
+function pickVoice(selId) {
+  const sel = document.getElementById(selId);
+  const name = sel ? sel.value : '';
+  if (name) {
+    const v = availableVoices.find(v => v.name === name);
+    if (v) return v;
+  }
   return availableVoices.find(v => v.lang.startsWith('es')) || null;
+}
+
+function buildUtterance(text, selId) {
+  const p   = PRESETS[activePreset] || PRESETS.ritual;
+  const utt = new SpeechSynthesisUtterance(text);
+  utt.lang   = 'es-ES';
+  utt.rate   = p.rate;
+  utt.pitch  = p.pitch;
+  utt.volume = 1;
+  const voice = pickVoice(selId);
+  if (voice) utt.voice = voice;
+  return utt;
 }
 
 function stopAll() {
   window.speechSynthesis.cancel();
-  isPlaying = false; currentPlayingId = null;
-  stopWaveAnim();
+  isPlaying = false; currentPlayingId = null; stopWave();
 }
 
 // ── Main story player ──
-window.toggleStoryAudio = function(id, title, text, playBtnId, waveformId, statusId, voiceName) {
+window.toggleStoryAudio = function(id, title, text, playBtnId, waveId, statusId, _ignored) {
   const playBtn  = document.getElementById(playBtnId);
   const statusEl = document.getElementById(statusId);
 
   if (currentPlayingId === id && isPlaying) {
     stopAll();
-    if (playBtn)  { playBtn.textContent = '▶'; playBtn.classList.remove('playing'); }
+    if (playBtn)  { playBtn.innerHTML = '▶'; playBtn.classList.remove('playing'); }
     if (statusEl) statusEl.textContent = 'Pausado';
-    resetWave(waveformId);
-    return;
+    resetWave(waveId); return;
   }
 
-  stopAll();
-  stopAllMiniPlayers();
+  stopAll(); stopAllMiniPlayers();
   currentPlayingId = id; isPlaying = true;
 
-  if (playBtn)  { playBtn.textContent = '⏸'; playBtn.classList.add('playing'); }
+  if (playBtn)  { playBtn.innerHTML = '⏸'; playBtn.classList.add('playing'); }
   if (statusEl) statusEl.textContent = 'Narrando...';
-  window.buildWaveform(waveformId, 50);
-  startWaveAnim(waveformId);
+  window.buildWaveform(waveId, 50);
+  animateWave(waveId);
 
-  const utt    = new SpeechSynthesisUtterance(`${title}. ${text}`);
-  utt.rate     = 0.85; utt.pitch = 0.75; utt.volume = 1; utt.lang = 'es-ES';
-  const voice  = pickVoice(voiceName);
-  if (voice) utt.voice = voice;
-
+  const utt = buildUtterance(`${title}. ${text}`, 'mainVoiceSelect');
   utt.onend = utt.onerror = () => {
-    isPlaying = false; currentPlayingId = null;
-    stopWaveAnim();
-    if (playBtn)  { playBtn.textContent = '▶'; playBtn.classList.remove('playing'); }
-    if (statusEl) statusEl.textContent = 'Terminado';
-    resetWave(waveformId);
+    isPlaying = false; currentPlayingId = null; stopWave();
+    if (playBtn)  { playBtn.innerHTML = '▶'; playBtn.classList.remove('playing'); }
+    if (statusEl) statusEl.textContent = '— Fin —';
+    resetWave(waveId);
   };
-
   currentUtterance = utt;
   window.speechSynthesis.speak(utt);
 };
 
 // ── Mini card player ──
 function stopAllMiniPlayers() {
-  document.querySelectorAll('.mini-play-btn').forEach(b => { b.textContent = '▶'; });
+  document.querySelectorAll('.mini-play-btn').forEach(b => b.textContent = '▶');
   document.querySelectorAll('.mini-wave').forEach(w => w.classList.remove('playing'));
 }
 
@@ -143,16 +184,12 @@ window.playCardAudio = function(id, title, text) {
     stopAll(); stopAllMiniPlayers(); return;
   }
   stopAll(); stopAllMiniPlayers();
-
   currentPlayingId = `mini-${id}`; isPlaying = true;
+
   if (btn)  btn.textContent = '⏸';
   if (wave) wave.classList.add('playing');
 
-  const utt    = new SpeechSynthesisUtterance(`${title}. ${text}`);
-  utt.rate     = 0.85; utt.pitch = 0.75; utt.volume = 1; utt.lang = 'es-ES';
-  const voice  = pickVoice('');
-  if (voice) utt.voice = voice;
-
+  const utt = buildUtterance(`${title}. ${text}`, '');
   utt.onend = utt.onerror = () => {
     isPlaying = false; currentPlayingId = null;
     if (btn)  btn.textContent = '▶';
@@ -162,41 +199,33 @@ window.playCardAudio = function(id, title, text) {
   window.speechSynthesis.speak(utt);
 };
 
-// ── Preview on upload page ──
+// ── Preview (subir page) ──
 window.previewAudio = function() {
   const titulo   = document.getElementById('titulo');
   const historia = document.getElementById('historia');
   const playBtn  = document.getElementById('previewPlayBtn');
   const statusEl = document.getElementById('previewStatus');
-  const voiceSel = document.getElementById('voiceSelect');
   if (!titulo || !historia) return;
 
-  const text = `${titulo.value || 'Sin título'}. ${historia.value || 'Escribe tu historia para escuchar la vista previa.'}`;
+  const snippet = `${titulo.value || 'Sin título'}. ${(historia.value || 'Escribe tu historia para escuchar la vista previa.').substring(0, 500)}`;
 
   if (currentPlayingId === 'preview' && isPlaying) {
     stopAll();
-    if (playBtn)  { playBtn.textContent = '▶'; playBtn.classList.remove('playing'); }
+    if (playBtn)  { playBtn.innerHTML = '▶'; playBtn.classList.remove('playing'); }
     if (statusEl) statusEl.textContent = 'Listo';
-    resetWave('previewWaveform');
-    return;
+    resetWave('previewWaveform'); return;
   }
-
   stopAll();
   currentPlayingId = 'preview'; isPlaying = true;
-  if (playBtn)  { playBtn.textContent = '⏸'; playBtn.classList.add('playing'); }
+  if (playBtn)  { playBtn.innerHTML = '⏸'; playBtn.classList.add('playing'); }
   if (statusEl) statusEl.textContent = 'Narrando...';
   window.buildWaveform('previewWaveform', 40);
-  startWaveAnim('previewWaveform');
+  animateWave('previewWaveform');
 
-  const utt    = new SpeechSynthesisUtterance(text.substring(0, 600));
-  utt.rate     = 0.85; utt.pitch = 0.75; utt.volume = 1; utt.lang = 'es-ES';
-  const voice  = pickVoice(voiceSel ? voiceSel.value : '');
-  if (voice) utt.voice = voice;
-
+  const utt = buildUtterance(snippet, 'voiceSelect');
   utt.onend = utt.onerror = () => {
-    isPlaying = false; currentPlayingId = null;
-    stopWaveAnim();
-    if (playBtn)  { playBtn.textContent = '▶'; playBtn.classList.remove('playing'); }
+    isPlaying = false; currentPlayingId = null; stopWave();
+    if (playBtn)  { playBtn.innerHTML = '▶'; playBtn.classList.remove('playing'); }
     if (statusEl) statusEl.textContent = 'Listo';
     resetWave('previewWaveform');
   };
@@ -204,15 +233,47 @@ window.previewAudio = function() {
   window.speechSynthesis.speak(utt);
 };
 
-// Stop on page leave
+// ── Build voice panel HTML ──
+window.buildVoicePanel = function(playBtnId, waveId, statusId, voiceSelId) {
+  const presetsHtml = Object.entries(PRESETS).map(([key, p]) =>
+    `<button class="preset-btn${key==='ritual'?' active':''}" data-preset="${key}" onclick="applyVoicePreset(this)">
+      <span class="preset-icon">${p.icon}</span>
+      <span class="preset-name">${p.label}</span>
+      <span class="preset-desc">${p.desc}</span>
+    </button>`
+  ).join('');
+
+  return `
+    <div class="audio-player">
+      <div class="audio-player-header">
+        <div class="audio-icon">🎙</div>
+        <div>
+          <div class="audio-player-title">Narrador del Terror</div>
+          <div class="audio-player-sub">Síntesis de voz — elige tu tono oscuro</div>
+        </div>
+      </div>
+      <div class="audio-controls-row">
+        <button type="button" class="audio-play-btn" id="${playBtnId}" onclick="window.__onAudioPlay&&window.__onAudioPlay()">▶</button>
+        <div class="audio-waveform" id="${waveId}"></div>
+        <span class="audio-status-text" id="${statusId}">Listo</span>
+      </div>
+      <div class="voice-panel">
+        <div class="voice-panel-label">Tono de Narración</div>
+        <div class="voice-presets-grid">${presetsHtml}</div>
+        <div class="voice-select-row">
+          <span class="voice-select-label">Voz:</span>
+          <select class="voice-select-simple" id="${voiceSelId}">
+            <option value="">🎙 Automática</option>
+          </select>
+        </div>
+      </div>
+    </div>`;
+};
+
 window.addEventListener('beforeunload', () => window.speechSynthesis.cancel());
 
 // ── Init ──
 if (window.speechSynthesis) {
   loadVoices();
   document.querySelectorAll('.audio-waveform').forEach(el => { if (el.id) window.buildWaveform(el.id, 40); });
-} else {
-  document.querySelectorAll('.audio-player').forEach(el => {
-    el.innerHTML += '<p style="font-size:0.8rem;color:var(--text-3);margin-top:0.5rem;">⚠ Tu navegador no soporta síntesis de voz.</p>';
-  });
 }
