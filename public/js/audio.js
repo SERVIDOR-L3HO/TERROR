@@ -2,13 +2,14 @@
 // HORROR AUDIO ENGINE — Voice Synthesis + Presets
 // ═══════════════════════════════════════════════
 
+// TikTok horror style = natural human pitch, slightly slow rate, clear voice
 const PRESETS = {
-  ritual:   { rate: 0.72, pitch: 0.35, label: 'Ritual',   icon: '💀', desc: 'Lento & profundo'   },
-  espectro: { rate: 0.60, pitch: 0.65, label: 'Espectro', icon: '👻', desc: 'Muy lento & suave'  },
-  demonio:  { rate: 0.88, pitch: 0.18, label: 'Demonio',  icon: '😈', desc: 'Grave & oscuro'     },
-  narrador: { rate: 0.80, pitch: 0.55, label: 'Narrador', icon: '🕯', desc: 'Claro & sombrío'    },
+  tiktok:   { rate: 0.86, pitch: 0.92, label: 'TikTok',   icon: '📱', desc: 'Natural & escalofriante' },
+  ritual:   { rate: 0.74, pitch: 0.88, label: 'Ritual',   icon: '💀', desc: 'Pausado & oscuro'        },
+  susurro:  { rate: 0.78, pitch: 1.05, label: 'Susurro',  icon: '👁',  desc: 'Íntimo & tenso'         },
+  narrador: { rate: 0.82, pitch: 0.82, label: 'Narrador', icon: '🎙',  desc: 'Profundo & sombrío'     },
 };
-let activePreset    = 'ritual';
+let activePreset    = 'tiktok';
 let currentPlayingId = null;
 let isPlaying        = false;
 let currentUtterance = null;

@@ -1,12 +1,13 @@
 // ═══════════════════════════════
 // LOADING OVERLAY
 // ═══════════════════════════════
-window.addEventListener('load', () => {
-  setTimeout(() => {
-    const el = document.getElementById('loadingOverlay');
-    if (el) el.classList.add('hidden');
-  }, 1200);
-});
+function hideLoader() {
+  const el = document.getElementById('loadingOverlay');
+  if (el) el.classList.add('hidden');
+}
+// Hide after page load + 1.2s, plus hard failsafe at 3s in case load event delays
+window.addEventListener('load', () => setTimeout(hideLoader, 1200));
+setTimeout(hideLoader, 3000);
 
 // ═══════════════════════════════
 // NAVBAR HAMBURGER
